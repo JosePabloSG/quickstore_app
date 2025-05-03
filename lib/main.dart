@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
-import 'package:quickstore_app/screens/home_screen.dart';
-import 'screens/product_catalog_screen.dart';
+import 'package:quickstore_app/screens/login_screen.dart';
 import 'providers/view_mode_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
       providers: [
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'QuickStore',
       theme: ThemeData(primarySwatch: Colors.blue),
-       home: const HomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }
