@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "551933924346",
+    "project_id": "quickstore-603e0",
+    "storage_bucket": "quickstore-603e0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551933924346:android:fa7cd432bb8fd7f00d4a43",
+        "android_client_info": {
+          "package_name": "com.admin.username"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPqFpatLIer9ArmR1qXj6fJpytMO2dwuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551933924346:android:61940a208cbc8f320d4a43",
+        "android_client_info": {
+          "package_name": "com.example.quickstore_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPqFpatLIer9ArmR1qXj6fJpytMO2dwuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
