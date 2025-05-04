@@ -13,15 +13,15 @@ class CategoryProvider with ChangeNotifier {
 
   Future<void> loadCategories() async {
     _isLoading = true;
-    notifyListeners(); // importante: se llama una vez al activar
+    notifyListeners(); // Notificar que empieza la carga
 
     try {
       _categories = await _apiService.fetchCategories();
     } catch (e) {
       print('Error al cargar categorías: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Siempre se notifica que terminó
     }
-
-    _isLoading = false;
-    notifyListeners(); // importante: se llama una vez al desactivar
   }
 }
