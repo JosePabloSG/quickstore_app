@@ -7,6 +7,7 @@ import 'providers/view_mode_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'package:quickstore_app/providers/category_provider.dart';
 
 void main() async {
   try {
@@ -19,6 +20,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => ViewModeProvider()),
           ChangeNotifierProvider(create: (_) => ProductProvider()),
+           ChangeNotifierProvider(create: (_) => CategoryProvider()),
         ],
         child: const MyApp(),
       ),
