@@ -3,29 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
 import 'package:quickstore_app/screens/login_screen.dart';
-import 'package:quickstore_app/screens/product_catalog_screen.dart';
+import 'package:quickstore_app/screens/main_navigation_screen.dart'; 
 import 'providers/view_mode_provider.dart';
+import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart';
 import 'package:quickstore_app/providers/category_provider.dart';
-
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
-
     // Configurar orientación y opciones del sistema
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
-
     // Desactivar logs de debug innecesarios
     debugPrintRebuildDirtyWidgets = false;
-
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
     runApp(
       MultiProvider(
         providers: [
@@ -47,10 +42,8 @@ void main() async {
     );
   }
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -58,7 +51,6 @@ class MyApp extends StatelessWidget {
       title: 'QuickStore',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        // Optimizaciones de rendimiento
         platform: TargetPlatform.android,
         pageTransitionsTheme: const PageTransitionsTheme(
           builders: {TargetPlatform.android: CupertinoPageTransitionsBuilder()},
@@ -81,20 +73,18 @@ class MyApp extends StatelessWidget {
               ),
             );
           }
-
           if (snapshot.hasError) {
             return Scaffold(
               body: Center(child: Text('Error: ${snapshot.error}')),
             );
           }
-
           if (snapshot.hasData) {
-            return const ProductCatalogScreen();
+            return const MainNavigationScreen(); // aquí menu 
           }
-
           return const LoginScreen();
         },
       ),
     );
   }
 }
+ 
