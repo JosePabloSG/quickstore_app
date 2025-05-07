@@ -6,7 +6,7 @@ class CategoryProvider with ChangeNotifier {
   final CategoryApiService _apiService = CategoryApiService();
 
   List<CategoryModel> _categories = [];
-  List<CategoryModel> get categories => _categories;
+  List<CategoryModel> get categories => [..._categories];
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
