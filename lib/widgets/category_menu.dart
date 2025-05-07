@@ -1,23 +1,11 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/product_provider.dart';
 
-
-class CategoryMenu extends StatefulWidget {
+class CategoryMenu extends StatelessWidget {
   const CategoryMenu({super.key});
-
-  @override
-  State<CategoryMenu> createState() => _CategoryMenuState();
-}
-
-class _CategoryMenuState extends State<CategoryMenu> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() =>
-        Provider.of<CategoryProvider>(context, listen: false).loadCategories());
-  }
 
   @override
   Widget build(BuildContext context) {
