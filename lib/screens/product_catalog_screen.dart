@@ -10,8 +10,10 @@ import '../providers/category_provider.dart';
 import '../widgets_shimmer/product_grid_item_shimmer.dart';
 import '../widgets_shimmer/product_list_item_shimmer.dart';
 import '../widgets_shimmer/category_menu_shimmer.dart';
+
 class ProductCatalogScreen extends StatefulWidget {
   const ProductCatalogScreen({Key? key}) : super(key: key);
+
   @override
   State<ProductCatalogScreen> createState() => _ProductCatalogScreenState();
 }
@@ -81,7 +83,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const Text(
-        'Categorías',
+        'Categories',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       const SizedBox(height: 8),

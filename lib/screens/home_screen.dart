@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const Text(
-        'Categorías',
+        'Categories',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       const SizedBox(height: 8),
