@@ -4,7 +4,9 @@ import './register_screen.dart';
 import './product_catalog_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final bool showLogoutMessage;
+
+  const LoginScreen({Key? key, this.showLogoutMessage = false}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,6 +18,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.showLogoutMessage) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Sesión cerrada exitosamente.'),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      });
+    }
+  }
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
@@ -84,9 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
-                    onPressed: _signIn,
-                    child: const Text('Iniciar Sesión'),
-                  ),
+                      onPressed: _signIn,
+                      child: const Text('Iniciar Sesión'),
+                    ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
