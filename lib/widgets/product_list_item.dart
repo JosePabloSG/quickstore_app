@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 import '../models/product.dart';
-import '../screens/product_detail_screen.dart'; // Asegúrate de importar
+import '../screens/product_detail_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductListItem extends StatelessWidget {
   final Product product;
@@ -36,18 +38,35 @@ class ProductListItem extends StatelessWidget {
             Hero(
               tag: 'product-image-${product.id}',
               child: ClipRRect(
-                borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
-                child: Image.network(
-                  product.imageUrl,
-                  width: 100,
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(16),
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: product.imageUrl,
                   height: 100,
+                  width: 100,
                   fit: BoxFit.cover,
+                  memCacheHeight: 200,
+                  memCacheWidth: 200,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey.shade200,
+                    child: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.broken_image),
+                  ),
                 ),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -55,12 +74,18 @@ class ProductListItem extends StatelessWidget {
                       product.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       '\$${product.price.toStringAsFixed(2)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
