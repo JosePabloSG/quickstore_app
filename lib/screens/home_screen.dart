@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quickstore_app/screens/login_screen.dart';
+import 'package:quickstore_app/services/auth_service.dart';
 import 'package:quickstore_app/widgets/popular_product.dart';
 import '../providers/product_provider.dart';
 import '../providers/category_provider.dart';
@@ -14,6 +16,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
@@ -23,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Provider.of<CategoryProvider>(context, listen: false).loadCategories();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -33,9 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 12),
-        ),
+        title: Padding(padding: const EdgeInsets.only(left: 12)),
         backgroundColor: Colors.white,
         elevation: 2,
       ),
@@ -64,54 +66,96 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.logout),
               title: const Text('Cerrar sesión'),
               onTap: () async {
-                await FirebaseAuth.instance.signOut();
+                final shouldLogout = await showDialog<bool>(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text('Confirmar cierre de sesión'),
+                        content: const Text(
+                          '¿Estás seguro de que deseas cerrar sesión?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancelar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text('Cerrar sesión'),
+                          ),
+                        ],
+                      ),
+                );
+
+                if (shouldLogout == true) {
+                  await AuthService()
+                      .signOut(); // 
+                  //final token = await AuthService().getStoredToken();
+                  //print(
+                    //'🔍 Token después de logout: $token',
+                  //); // Esto debe ser null
+                  if (!context.mounted) return;
+
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => const LoginScreen(showLogoutMessage: true)
+                    ),
+                    (route) => false,
+                  );
+                }
               },
             ),
           ],
         ),
       ),
       body: Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        'Categories',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Categories',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            // Carrusel de categorías
+            categoryProvider.isLoading
+                ? const CategoryMenuShimmer()
+                : const CategoryMenu(),
+            const SizedBox(height: 20),
+            const Text(
+              'Most Popular',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: popularProducts.length,
+                itemBuilder:
+                    (context, index) =>
+                        PopularProductCard(product: popularProducts[index]),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Just For You',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child:
+                  productProvider.isLoading
+                      ? _buildGridShimmer()
+                      : _buildGridView(products),
+            ),
+          ],
+        ),
       ),
-      const SizedBox(height: 8),
-      // Carrusel de categorías
-      categoryProvider.isLoading
-          ? const CategoryMenuShimmer()
-          : const CategoryMenu(),
-      const SizedBox(height: 20),
-      const Text(
-  'Most Popular',
-  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
-  const SizedBox(height: 8),
-SizedBox(
-  height: 200,
-  child: ListView.builder(
-    scrollDirection: Axis.horizontal,
-    itemCount: popularProducts.length,
-    itemBuilder: (context, index) => PopularProductCard(product: popularProducts[index]),
-  ),
-),
-const SizedBox(height: 20),
-      const Text(
-        'Just For You',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-      ),
-      const SizedBox(height: 8),
-      Expanded(
-        child: productProvider.isLoading
-            ? _buildGridShimmer()
-            : _buildGridView(products),
-      ),
-    ],
-  ),
-)
-  );}
+    );
+  }
+
   Widget _buildGridView(List products) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -140,6 +184,7 @@ const SizedBox(height: 20),
       },
     );
   }
+
   Widget _buildGridShimmer() {
     return LayoutBuilder(
       builder: (context, constraints) {
