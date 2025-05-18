@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import './register_screen.dart';
 import './product_catalog_screen.dart';
+import './forgot_password_screen.dart'; //Si esta
 
 class LoginScreen extends StatefulWidget {
   final bool showLogoutMessage;
 
-  const LoginScreen({Key? key, this.showLogoutMessage = false}) : super(key: key);
+  const LoginScreen({Key? key, this.showLogoutMessage = false})
+    : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _isLoading = false;
+  bool _showResetLink = false;
 
   @override
   void initState() {
@@ -37,7 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _showResetLink = false; // Reinicia al intentar
+      });
 
       final user = await _authService.signIn(
         _emailController.text,
@@ -51,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const ProductCatalogScreen()),
         );
       } else if (mounted) {
+        setState(() => _showResetLink = true); // Mostrar enlace
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al iniciar sesión')),
         );
@@ -102,10 +109,22 @@ class _LoginScreenState extends State<LoginScreen> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed: _signIn,
-                      child: const Text('Iniciar Sesión'),
-                    ),
+                    onPressed: _signIn,
+                    child: const Text('Iniciar Sesión'),
+                  ),
               const SizedBox(height: 16),
+              if (_showResetLink)
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('¿Olvidaste tu contraseña?'),
+                ),
               TextButton(
                 onPressed: () {
                   Navigator.push(

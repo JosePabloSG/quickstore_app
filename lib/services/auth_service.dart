@@ -9,10 +9,8 @@ class AuthService {
 
   Future<User?> signIn(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
 
       final user = userCredential.user;
       if (user != null) {
@@ -31,10 +29,8 @@ class AuthService {
 
   Future<User?> signUp(String email, String password) async {
     try {
-      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       final user = userCredential.user;
       if (user != null) {
@@ -57,6 +53,16 @@ class AuthService {
       await _secureStorage.delete(key: _tokenKey);
     } catch (e) {
       print('Error signing out: $e');
+    }
+  }
+
+  Future<bool> sendPasswordReset(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      print('Error al enviar correo de recuperación: $e');
+      return false;
     }
   }
 
