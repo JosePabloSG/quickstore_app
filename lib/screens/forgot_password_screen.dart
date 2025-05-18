@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -37,40 +38,121 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Recuperar Contraseña')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Ingresa tu correo para enviarte un enlace de recuperación',
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned(
+              top: -50,
+              left: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                'assets/Images/Bubbles_register.svg',
+                width: screenWidth,
+                fit: BoxFit.fitWidth,
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+            ),
+            Container(
+              width: screenWidth * 0.85,
+              height: screenHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.075),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Forgot\nPassword',
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Enter your email to reset your password',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      validator:
+                          (value) =>
+                              value == null || value.isEmpty
+                                  ? 'Please enter your email'
+                                  : null,
+                    ),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: _isSending ? null : _sendResetEmail,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF004CFF),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child:
+                            _isSending
+                                ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                                : const Text(
+                                  'Send Link',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.black54, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Ingresa un email'
-                            : null,
               ),
-              const SizedBox(height: 20),
-              _isSending
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                    onPressed: _sendResetEmail,
-                    child: const Text('Enviar enlace'),
-                  ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
