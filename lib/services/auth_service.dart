@@ -56,6 +56,16 @@ class AuthService {
     }
   }
 
+  Future<bool> sendPasswordReset(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      print('Error al enviar correo de recuperación: $e');
+      return false;
+    }
+  }
+
   Future<String?> getStoredToken() async {
     return await _secureStorage.read(key: _tokenKey);
   }

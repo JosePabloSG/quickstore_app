@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import './register_screen.dart';
 import './product_catalog_screen.dart';
-import './forgot_password_screen.dart';
+import './forgot_password_screen.dart'; //Si esta
 
 class LoginScreen extends StatefulWidget {
   final bool showLogoutMessage;
 
-  const LoginScreen({Key? key, this.showLogoutMessage = false}) : super(key: key);
+  const LoginScreen({Key? key, this.showLogoutMessage = false})
+    : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -108,9 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
-                      onPressed: _signIn,
-                      child: const Text('Iniciar Sesión'),
-                    ),
+                    onPressed: _signIn,
+                    child: const Text('Iniciar Sesión'),
+                  ),
               const SizedBox(height: 16),
               if (_showResetLink)
                 TextButton(
