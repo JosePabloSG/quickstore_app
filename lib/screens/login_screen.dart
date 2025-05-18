@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import './register_screen.dart';
 import './product_catalog_screen.dart';
+import './forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,10 +17,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _isLoading = false;
+  bool _showResetLink = false;
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _showResetLink = false; // Reinicia al intentar
+      });
 
       final user = await _authService.signIn(
         _emailController.text,
@@ -33,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const ProductCatalogScreen()),
         );
       } else if (mounted) {
+        setState(() => _showResetLink = true); // Mostrar enlace
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al iniciar sesión')),
         );
@@ -88,6 +94,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Iniciar Sesión'),
                   ),
               const SizedBox(height: 16),
+              if (_showResetLink)
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('¿Olvidaste tu contraseña?'),
+                ),
               TextButton(
                 onPressed: () {
                   Navigator.push(
