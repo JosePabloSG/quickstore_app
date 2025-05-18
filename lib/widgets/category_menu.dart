@@ -3,25 +3,15 @@ import 'package:provider/provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/product_provider.dart';
 
-
-class CategoryMenu extends StatefulWidget {
+class CategoryMenu extends StatelessWidget {
   const CategoryMenu({super.key});
 
   @override
-  State<CategoryMenu> createState() => _CategoryMenuState();
-}
-
-class _CategoryMenuState extends State<CategoryMenu> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() =>
-        Provider.of<CategoryProvider>(context, listen: false).loadCategories());
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final categories = context.watch<CategoryProvider>().categories;
+    final categoryProvider = context.watch<CategoryProvider>();
+    final productProvider = context.watch<ProductProvider>();
+    final allProducts = productProvider.allProducts;
+    final categories = categoryProvider.categories;
 
     return SizedBox(
       height: 120,
@@ -31,11 +21,15 @@ class _CategoryMenuState extends State<CategoryMenu> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         itemBuilder: (context, index) {
           final category = categories[index];
+          final count = allProducts
+              .where((product) => product.categoryId == category.id)
+              .length;
+
           return GestureDetector(
             onTap: () {
               Provider.of<ProductProvider>(context, listen: false)
                   .fetchProductsByCategory(category.id);
-              print('Seleccionaste ${category.name}');
+              debugPrint('Seleccionaste ${category.name}');
             },
             child: Container(
               width: 100,
@@ -49,14 +43,20 @@ class _CategoryMenuState extends State<CategoryMenu> {
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.image_not_supported),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     category.name,
                     style: const TextStyle(fontSize: 12),
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '$count productos',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                 ],
               ),
