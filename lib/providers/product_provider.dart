@@ -11,6 +11,9 @@ class ProductProvider with ChangeNotifier {
   List<Product> _products = [];
   List<Product> get products => [..._products];
 
+  List<Product> _filteredProducts = [];
+  List<Product> get filteredProducts => [..._filteredProducts];
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -28,6 +31,7 @@ class ProductProvider with ChangeNotifier {
       } else {
         _products = [..._allProducts];
       }
+      _filteredProducts = [..._products]; // inicializa con todos
       print('Productos cargados: ${_products.length}');
     } catch (e) {
       print('Error al cargar productos: $e');
@@ -39,15 +43,33 @@ class ProductProvider with ChangeNotifier {
 
   void fetchProductsByCategory(int categoryId) {
     _currentCategoryId = categoryId;
-    _products = _allProducts
-        .where((product) => product.categoryId == categoryId)
-        .toList();
+    _products =
+        _allProducts
+            .where((product) => product.categoryId == categoryId)
+            .toList();
+    _filteredProducts = [..._products];
+    notifyListeners();
+  }
+
+  void filterProducts(String query) {
+    if (query.isEmpty) {
+      _filteredProducts = [..._products];
+    } else {
+      _filteredProducts =
+          _products
+              .where(
+                (product) =>
+                    product.title.toLowerCase().contains(query.toLowerCase()),
+              )
+              .toList();
+    }
     notifyListeners();
   }
 
   void resetProducts() {
     _currentCategoryId = null;
     _products = [..._allProducts];
+    _filteredProducts = [..._products];
     notifyListeners();
   }
 }
