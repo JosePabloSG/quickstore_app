@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import './register_screen.dart';
 import './product_catalog_screen.dart';
+import './forgot_password_screen.dart'; //Si esta
 
 class LoginScreen extends StatefulWidget {
   final bool showLogoutMessage;
@@ -20,6 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _authService = AuthService();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
+  bool _showResetLink = false;
+
 
   @override
   void initState() {
@@ -38,7 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _showResetLink = false; // Reinicia al intentar
+      });
 
       final user = await _authService.signIn(
         _emailController.text,
@@ -52,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (_) => const ProductCatalogScreen()),
         );
       } else if (mounted) {
+        setState(() => _showResetLink = true); // Mostrar enlace
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
