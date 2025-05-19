@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
 import 'package:quickstore_app/screens/login_screen.dart';
-import 'package:quickstore_app/screens/main_navigation_screen.dart'; 
+import 'package:quickstore_app/screens/main_navigation_screen.dart';
 import 'providers/view_mode_provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quickstore_app/providers/category_provider.dart';
+import 'package:quickstore_app/providers/search_provider.dart';
+
 void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +30,8 @@ void main() async {
           ChangeNotifierProvider(create: (_) => ViewModeProvider()),
           ChangeNotifierProvider(create: (_) => ProductProvider()),
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
-          ChangeNotifierProvider(create: (_) => CartProvider()),  
+          ChangeNotifierProvider(create: (_) => CartProvider()),
+          ChangeNotifierProvider(create: (_) => SearchProvider()),
         ],
         child: const MyApp(),
       ),
@@ -44,6 +47,7 @@ void main() async {
     );
   }
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
@@ -81,7 +85,7 @@ class MyApp extends StatelessWidget {
             );
           }
           if (snapshot.hasData) {
-            return const MainNavigationScreen(); // aquí menu 
+            return const MainNavigationScreen(); // aquí menu
           }
           return const LoginScreen();
         },
@@ -89,4 +93,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
- 
