@@ -23,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _showResetLink = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -177,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _isPasswordVisible
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                                color: const Color(0xFF004CFF),
+                            color: const Color(0xFF004CFF),
                           ),
                           onPressed: () {
                             setState(() {
@@ -192,6 +191,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed:
+                            _isLoading
+                                ? null
+                                : () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => const ForgotPasswordScreen(),
+                                  ),
+                                ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF004CFF),
+                        ),
+                        child: const Text(
+                          '¿Olvidaste tu contraseña?',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -235,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                         child: const Text(
                           '¿No tienes cuenta? Regístrate',
-                          style: TextStyle(color: Colors.black54,),
+                          style: TextStyle(color: Colors.black54),
                         ),
                       ),
                     ),
