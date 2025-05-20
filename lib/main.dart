@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
+import 'package:quickstore_app/providers/favorites_provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
 import 'package:quickstore_app/screens/login_screen.dart';
 import 'package:quickstore_app/screens/main_navigation_screen.dart';
@@ -32,6 +33,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => CategoryProvider()),
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (_) => SearchProvider()),
+          ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ],
         child: const MyApp(),
       ),
