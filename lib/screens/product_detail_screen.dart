@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickstore_app/providers/favorites_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
@@ -167,23 +168,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Row(
               children: [
                 // Favorite toggle
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        isFavorite = !isFavorite;
-                      });
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : null,
-                    ),
-                  ),
-                ),
+               Expanded(
+  child: OutlinedButton(
+    onPressed: () {
+      final favoritesProvider = context.read<FavoritesProvider>();
+      setState(() {
+        isFavorite = !isFavorite;
+      });
+      if (isFavorite) {
+        favoritesProvider.addFavorite(widget.product);
+      } else {
+        favoritesProvider.removeFavorite(widget.product.id);
+      }
+    },
+    style: OutlinedButton.styleFrom(
+      side: const BorderSide(color: Colors.grey),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+    ),
+    child: Icon(
+      isFavorite ? Icons.favorite : Icons.favorite_border,
+      color: isFavorite ? Colors.red : null,
+    ),
+  ),
+),
                 const SizedBox(width: 10),
                 // Add to cart
                 Expanded(
