@@ -12,23 +12,37 @@ class MainNavigationScreen extends StatefulWidget {
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
+
+
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    FavoritesScreen(),
-    ProductCatalogScreen(),
-    CartScreen(),
-    ProfileScreen(),
-    
+
+  void changeTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+    late List<Widget> _screens;
+
+@override
+void initState() {
+  super.initState();
+  _screens = [
+    const HomeScreen(),
+    FavoritesScreen(onBack: () => setState(() => _currentIndex = 0)),
+    const ProductCatalogScreen(),
+    CartScreen(onBack: () => setState(() => _currentIndex = 0)), 
+    const ProfileScreen(),
   ];
+} 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+         onTap: (index) => setState(() => _currentIndex = index),
       ),
     );
   }
