@@ -19,7 +19,7 @@ class PopularProductCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 160,
+        width: 110,
         margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -38,30 +38,22 @@ class PopularProductCard extends StatelessWidget {
             Hero(
               tag: 'product-image-${product.id}',
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: Image.network(
                   product.imageUrl,
-                  height: 120,
+                  height: 100,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    product.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
                   const SizedBox(height: 6),
                   Text(
                     '\$${product.price.toStringAsFixed(2)}',

@@ -67,7 +67,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               '\$${product.price.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -152,9 +156,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     if (quantity < currentStock) {
                       setState(() => quantity++);
                     } else {
-                     
-                showTopNotification(context, 'There are no more units available');
-                
+                      showTopNotification(
+                        context,
+                        'There are no more units available',
+                      );
                     }
                   },
                 ),
@@ -168,29 +173,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             child: Row(
               children: [
                 // Favorite toggle
-               Expanded(
-  child: OutlinedButton(
-    onPressed: () {
-      final favoritesProvider = context.read<FavoritesProvider>();
-      setState(() {
-        isFavorite = !isFavorite;
-      });
-      if (isFavorite) {
-        favoritesProvider.addFavorite(widget.product);
-      } else {
-        favoritesProvider.removeFavorite(widget.product.id);
-      }
-    },
-    style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: Colors.grey),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-    ),
-    child: Icon(
-      isFavorite ? Icons.favorite : Icons.favorite_border,
-      color: isFavorite ? Colors.red : null,
-    ),
-  ),
-),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      final favoritesProvider =
+                          context.read<FavoritesProvider>();
+                      setState(() {
+                        isFavorite = !isFavorite;
+                      });
+                      if (isFavorite) {
+                        favoritesProvider.addFavorite(widget.product);
+                      } else {
+                        favoritesProvider.removeFavorite(widget.product.id);
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.grey),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : null,
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 10),
                 // Add to cart
                 Expanded(
@@ -201,7 +207,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               Provider.of<CartProvider>(
                                 context,
                                 listen: false,
-                              ).addToCart(widget.product);
+                              ).addToCart(widget.product, quantity: quantity);
                               showDialog(
                                 context: context,
                                 builder:
@@ -236,6 +242,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                                       () => Navigator.pop(
                                                         context,
                                                       ),
+                                                  style: ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        Colors.black,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 14,
+                                                        ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                    ),
+                                                  ),
                                                   child: const Text(
                                                     'Continue Shopping',
                                                   ),

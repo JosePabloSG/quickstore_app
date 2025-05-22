@@ -6,11 +6,12 @@ class CartProvider with ChangeNotifier {
 
   Map<String, CartItem> get items => _items;
 
-  void addToCart(Product product) {
+  /// Permite agregar múltiples unidades de un producto
+  void addToCart(Product product, {int quantity = 1}) {
     if (_items.containsKey(product.id)) {
-      _items[product.id]!.quantity++;
+      _items[product.id]!.quantity += quantity;
     } else {
-      _items[product.id] = CartItem(product: product);
+      _items[product.id] = CartItem(product: product, quantity: quantity);
     }
     notifyListeners();
   }
@@ -40,6 +41,14 @@ class CartProvider with ChangeNotifier {
   double get shipping => subtotal > 0 ? 5.0 : 0.0;
 
   double get total => subtotal + shipping;
+
+  int get totalQuantity {
+    int total = 0;
+    for (var item in _items.values) {
+      total += item.quantity;
+    }
+    return total;
+  }
 
   void clearCart() {
     _items.clear();

@@ -130,7 +130,11 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Categories',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
               categoryProvider.isLoading
@@ -139,11 +143,15 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Most Popular',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
               SizedBox(
-                height: 200,
+                height: 160,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
@@ -154,10 +162,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           PopularProductCard(product: popularProducts[index]),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               const Text(
                 'Just For You',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
               SizedBox(
