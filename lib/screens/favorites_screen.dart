@@ -7,14 +7,20 @@ import '../providers/favorites_provider.dart';
 import '../providers/cart_provider.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+
+ final VoidCallback? onBack;
+
+  const FavoritesScreen({super.key, this.onBack});
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
+
+
 class _FavoritesScreenState extends State<FavoritesScreen> {
   String sortOption = 'default';
+
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +36,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: Colors.black),
-    onPressed: () => Navigator.pop(context),
-  ),
+     leading: IconButton(
+  icon: const Icon(Icons.arrow_back, color: Colors.black),
+  onPressed: widget.onBack ?? () => Navigator.pop(context),
+),
         title: const Text('Favorites',
           style: TextStyle(
          fontSize: 24,           
@@ -56,8 +62,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
         ],
       ),
-      body: products.isEmpty
-          ? const Center(child: Text('No favorites yet.'))
+     body: products.isEmpty
+    ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/Images/fav.png',
+              width: 180,
+              height: 180,
+            ),
+          ],
+        ),
+      )
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: products.length,

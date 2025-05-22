@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quickstore_app/providers/search_provider.dart';
+import 'package:quickstore_app/widgets/search_bar.dart';
+import 'package:quickstore_app/widgets/search_history_list.dart';
 import '../widgets/product_grid_item.dart';
 import '../widgets/product_list_item.dart';
 import '../widgets/category_menu.dart';
@@ -61,6 +64,17 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                   SearchBarWidget(
+                onSearch: (query) {
+                  context.read<ProductProvider>().filterProducts(query);
+                },
+              ),
+              // Historial de búsqueda
+              SearchHistoryList(
+                onTapHistory: (term) {
+                  context.read<SearchProvider>().updateQuery(term);
+                  context.read<ProductProvider>().filterProducts(term);
+                }),
                   const CircleAvatar(
                     radius: 30,
                     child: Icon(Icons.person, size: 30),
