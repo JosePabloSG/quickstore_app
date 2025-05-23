@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
@@ -40,24 +39,29 @@ class ProductGridItem extends StatelessWidget {
             Hero(
               tag: 'product-image-${product.id}',
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: CachedNetworkImage(
                   imageUrl: product.imageUrl,
-                  height: 120, // Reduje ligeramente la altura para prevenir overflow
+                  height:
+                      120, // Reduje ligeramente la altura para prevenir overflow
                   width: double.infinity,
                   fit: BoxFit.cover,
                   memCacheHeight: 280,
                   memCacheWidth: 280,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.broken_image),
-                  ),
+                  placeholder:
+                      (context, url) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.broken_image),
+                      ),
                 ),
               ),
             ),
@@ -68,7 +72,7 @@ class ProductGridItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
+                    Flexible(
                       child: Text(
                         product.title,
                         style: const TextStyle(
@@ -80,7 +84,7 @@ class ProductGridItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       '\$${product.price.toStringAsFixed(2)}',
                       style: const TextStyle(

@@ -20,6 +20,7 @@ class ProductCatalogScreen extends StatefulWidget {
   @override
   State<ProductCatalogScreen> createState() => _ProductCatalogScreenState();
 }
+
 class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   @override
   void initState() {
@@ -64,17 +65,18 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   SearchBarWidget(
-                onSearch: (query) {
-                  context.read<ProductProvider>().filterProducts(query);
-                },
-              ),
-              // Historial de búsqueda
-              SearchHistoryList(
-                onTapHistory: (term) {
-                  context.read<SearchProvider>().updateQuery(term);
-                  context.read<ProductProvider>().filterProducts(term);
-                }),
+                  SearchBarWidget(
+                    onSearch: (query) {
+                      context.read<ProductProvider>().filterProducts(query);
+                    },
+                  ),
+                  // Historial de búsqueda
+                  SearchHistoryList(
+                    onTapHistory: (term) {
+                      context.read<SearchProvider>().updateQuery(term);
+                      context.read<ProductProvider>().filterProducts(term);
+                    },
+                  ),
                   const CircleAvatar(
                     radius: 30,
                     child: Icon(Icons.person, size: 30),
@@ -104,7 +106,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
           children: [
             const Text(
               'Categories',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 8),
             // Carrusel de categorías
@@ -114,7 +120,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             const SizedBox(height: 20),
             const Text(
               'Just For You',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 8),
             Expanded(
@@ -135,6 +145,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       ),
     );
   }
+
   Widget _buildGridView(List products) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -162,6 +173,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       },
     );
   }
+
   Widget _buildListView(List products) {
     return ListView.builder(
       padding: const EdgeInsets.all(8),
@@ -170,6 +182,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
           (context, index) => ProductListItem(product: products[index]),
     );
   }
+
   Widget _buildGridShimmer() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -196,6 +209,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       },
     );
   }
+
   Widget _buildListShimmer() {
     return ListView.builder(
       padding: const EdgeInsets.all(8),
