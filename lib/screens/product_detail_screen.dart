@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickstore_app/providers/buyNow_provider.dart';
 import 'package:quickstore_app/providers/favorites_provider.dart';
+import 'package:quickstore_app/screens/payment_methods_screen.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
@@ -296,14 +298,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // Buy now
                 Expanded(
                   child: ElevatedButton(
-                    onPressed:
-                        currentStock == 0
-                            ? null
-                            : () {
-                              // Acción de compra
-                            },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004CFF),
+                 onPressed: currentStock == 0
+    ? null
+    : () {
+        final buyNow = Provider.of<BuyNowProvider>(context, listen: false);
+        buyNow.setPurchase(widget.product, quantity);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PaymentScreen(fromBuyNow: true),
+          ),
+        );
+      },
+       style: ElevatedButton.styleFrom(
+                      backgroundColor:const Color(0xFF004CFF),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),

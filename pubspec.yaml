@@ -68,8 +68,7 @@ flutter:
     - assets/Images/Bubbles_register.svg
     - assets/Images/fav.png
     - assets/Images/cart.png
-    - assets/Images/add_cart.png
-    - assets/Images/delete.png
+   
 
   # To add assets to your application, add an assets section, like this:
   # assets:
