@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickstore_app/providers/product_provider.dart';
+import 'package:quickstore_app/screens/payment_methods_screen.dart';
+import 'package:quickstore_app/widgets/popular_product.dart';
 import '../providers/cart_provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -12,6 +15,8 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final items = cart.items.values.toList();
+    final productProvider = context.watch<ProductProvider>();
+    final popularProducts = productProvider.products.take(5).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -46,14 +51,43 @@ class CartScreen extends StatelessWidget {
       ),
       body:
           items.isEmpty
-              ? Center(
+              ? SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(
-                      'assets/Images/cart.png',
-                      width: 180,
-                      height: 180,
+                    Center(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 120),
+                          Image.asset(
+                            'assets/Images/cart.png',
+                            width: 180,
+                            height: 180,
+                          ),
+                          const SizedBox(height: 125),
+                        ],
+                      ),
+                    ),
+                    const Text(
+                      'Most Popular',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 160,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: popularProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = popularProducts[index];
+                          return PopularProductCard(product: product);
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -339,7 +373,16 @@ class CartScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) =>
+                                        const PaymentScreen(), // Asegúrate que no requiere parámetros
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             backgroundColor: const Color(0xFF004CFF),
