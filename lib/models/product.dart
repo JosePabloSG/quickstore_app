@@ -25,14 +25,15 @@ class Product {
     return Product(
       id: json['id'].toString(),
       title: json['title'],
-      imageUrl: json['images'][0],
+      imageUrl: (json['images'] != null && json['images'].isNotEmpty)
+          ? json['images'][0]
+          : '',
       price: (json['price'] as num).toDouble(),
-      categoryId: json['category']['id'],
-      rating: 4.5,
-      reviews: 123,
-      stock: json['stock'] ?? 2,
+      categoryId: int.parse(json['categoryId'].toString()),
+      rating: (json['rating'] as num).toDouble(),
+      reviews: json['reviews'] ?? 0,
+      stock: json['stock'] ?? 0,
       hasPriceChanged: json['hasPriceChanged'] ?? false,
-
     );
   }
 }
