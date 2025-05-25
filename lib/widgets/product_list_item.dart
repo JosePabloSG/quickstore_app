@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
@@ -36,7 +35,7 @@ class ProductListItem extends StatelessWidget {
         child: Row(
           children: [
             Hero(
-              tag: 'product-image-${product.id}',
+              tag: 'product-image-detail-${product.id}',
               child: ClipRRect(
                 borderRadius: const BorderRadius.horizontal(
                   left: Radius.circular(16),
@@ -48,16 +47,18 @@ class ProductListItem extends StatelessWidget {
                   fit: BoxFit.cover,
                   memCacheHeight: 200,
                   memCacheWidth: 200,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey.shade200,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.broken_image),
-                  ),
+                  placeholder:
+                      (context, url) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.broken_image),
+                      ),
                 ),
               ),
             ),

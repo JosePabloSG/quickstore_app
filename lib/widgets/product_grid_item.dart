@@ -37,7 +37,7 @@ class ProductGridItem extends StatelessWidget {
           children: [
             // Imagen del producto con animación
             Hero(
-              tag: 'product-image-${product.id}',
+              tag: 'product-image-detail-${product.id}',
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
