@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'profile_details_screen.dart';
 import 'shipping_address_screen.dart';
-import 'payment_methods_screen.dart';
+import 'manage_payment_methods_screen.dart';
 import 'terms_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -53,6 +53,19 @@ class ProfileScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => const ShippingAddressScreen(),
+                    ),
+                  );
+                },
+              ),
+              _buildNavigationTile(
+                context,
+                'Payment Methods',
+                icon: Icons.arrow_forward_ios,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ManagePaymentMethodsScreen(),
                     ),
                   );
                 },
