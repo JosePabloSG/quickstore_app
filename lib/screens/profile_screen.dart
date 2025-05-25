@@ -59,19 +59,6 @@ class ProfileScreen extends StatelessWidget {
               ),
               _buildNavigationTile(
                 context,
-                'Payment methods',
-                icon: Icons.arrow_forward_ios,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PaymentMethodsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildNavigationTile(
-                context,
                 'Terms and Conditions',
                 icon: Icons.arrow_forward_ios,
                 onTap: () {
