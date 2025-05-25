@@ -10,6 +10,9 @@ import '../widgets/category_menu.dart';
 import '../widgets/product_grid_item.dart';
 import '../widgets_shimmer/category_menu_shimmer.dart';
 import '../widgets_shimmer/product_grid_item_shimmer.dart';
+import '../widgets/search_bar.dart';
+import '../providers/search_provider.dart';
+import '../widgets/search_history_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,11 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final productProvider = context.watch<ProductProvider>();
     final categoryProvider = context.watch<CategoryProvider>();
     final products = productProvider.products;
-    final popularProducts = products.take(5).toList(); //cambiarlo
+    final filteredProducts = productProvider.filteredProducts;
+    final popularProducts = products.take(5).toList();
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        title: Padding(padding: const EdgeInsets.only(left: 12)),
+        title: const Padding(padding: EdgeInsets.only(left: 12)),
         backgroundColor: Colors.white,
         elevation: 2,
       ),
@@ -88,17 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
 
                 if (shouldLogout == true) {
-                  await AuthService()
-                      .signOut(); // 
-                  //final token = await AuthService().getStoredToken();
-                  //print(
-                    //'🔍 Token después de logout: $token',
-                  //); // Esto debe ser null
+                  await AuthService().signOut();
                   if (!context.mounted) return;
-
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
-                      builder: (_) => const LoginScreen(showLogoutMessage: true)
+                      builder:
+                          (_) => const LoginScreen(showLogoutMessage: true),
                     ),
                     (route) => false,
                   );
@@ -110,47 +110,77 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Categories',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            // Carrusel de categorías
-            categoryProvider.isLoading
-                ? const CategoryMenuShimmer()
-                : const CategoryMenu(),
-            const SizedBox(height: 20),
-            const Text(
-              'Most Popular',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: popularProducts.length,
-                itemBuilder:
-                    (context, index) =>
-                        PopularProductCard(product: popularProducts[index]),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Barra de búsqueda
+              SearchBarWidget(
+                onSearch: (query) {
+                  context.read<ProductProvider>().filterProducts(query);
+                },
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Just For You',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child:
-                  productProvider.isLoading
-                      ? _buildGridShimmer()
-                      : _buildGridView(products),
-            ),
-          ],
+              // Historial de búsqueda
+              SearchHistoryList(
+                onTapHistory: (term) {
+                  context.read<SearchProvider>().updateQuery(term);
+                  context.read<ProductProvider>().filterProducts(term);
+                },
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Categories',
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              categoryProvider.isLoading
+                  ? const CategoryMenuShimmer()
+                  : const CategoryMenu(),
+              const SizedBox(height: 20),
+              const Text(
+                'Most Popular',
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 160,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: popularProducts.length,
+                  itemBuilder:
+                      (context, index) =>
+                          PopularProductCard(product: popularProducts[index]),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const Text(
+                'Just For You',
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child:
+                    productProvider.isLoading
+                        ? _buildGridShimmer()
+                        : _buildGridView(filteredProducts),
+              ),
+            ],
+          ),
         ),
       ),
     );

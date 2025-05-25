@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quickstore_app/providers/search_provider.dart';
+import 'package:quickstore_app/widgets/search_bar.dart';
+import 'package:quickstore_app/widgets/search_history_list.dart';
 import '../widgets/product_grid_item.dart';
 import '../widgets/product_list_item.dart';
 import '../widgets/category_menu.dart';
@@ -17,6 +20,7 @@ class ProductCatalogScreen extends StatefulWidget {
   @override
   State<ProductCatalogScreen> createState() => _ProductCatalogScreenState();
 }
+
 class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   @override
   void initState() {
@@ -27,6 +31,12 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       Provider.of<CategoryProvider>(context, listen: false).loadCategories();
     });
   }
+
+  Future<void> _handleRefresh() async {
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+    await provider.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewMode = context.watch<ViewModeProvider>().viewMode;
@@ -55,6 +65,18 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SearchBarWidget(
+                    onSearch: (query) {
+                      context.read<ProductProvider>().filterProducts(query);
+                    },
+                  ),
+                  // Historial de búsqueda
+                  SearchHistoryList(
+                    onTapHistory: (term) {
+                      context.read<SearchProvider>().updateQuery(term);
+                      context.read<ProductProvider>().filterProducts(term);
+                    },
+                  ),
                   const CircleAvatar(
                     radius: 30,
                     child: Icon(Icons.person, size: 30),
@@ -77,39 +99,53 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
           ],
         ),
       ),
-    body: Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        'Categories',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Categories',
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Carrusel de categorías
+            categoryProvider.isLoading
+                ? const CategoryMenuShimmer()
+                : const CategoryMenu(),
+            const SizedBox(height: 20),
+            const Text(
+              'Just For You',
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child:
+                    productProvider.isLoading
+                        ? (viewMode == ViewMode.grid
+                            ? _buildGridShimmer()
+                            : _buildListShimmer())
+                        : (viewMode == ViewMode.grid
+                            ? _buildGridView(products)
+                            : _buildListView(products)),
+              ),
+            ),
+          ],
+        ),
       ),
-      const SizedBox(height: 8),
-      // Carrusel de categorías
-      categoryProvider.isLoading
-          ? const CategoryMenuShimmer()
-          : const CategoryMenu(),
-      const SizedBox(height: 20),
-      const Text(
-        'Just For You',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-      ),
-      const SizedBox(height: 8),
-      Expanded(
-        child: productProvider.isLoading
-            ? (viewMode == ViewMode.grid
-                ? _buildGridShimmer()
-                : _buildListShimmer())
-            : (viewMode == ViewMode.grid
-                ? _buildGridView(products)
-                : _buildListView(products)),
-      ),
-    ],
-  ),
-)
-  );}
+    );
+  }
+
   Widget _buildGridView(List products) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -131,20 +167,22 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
           ),
-          itemBuilder: (context, index) =>
-              ProductGridItem(product: products[index]),
+          itemBuilder:
+              (context, index) => ProductGridItem(product: products[index]),
         );
       },
     );
   }
+
   Widget _buildListView(List products) {
     return ListView.builder(
       padding: const EdgeInsets.all(8),
       itemCount: products.length,
-      itemBuilder: (context, index) =>
-          ProductListItem(product: products[index]),
+      itemBuilder:
+          (context, index) => ProductListItem(product: products[index]),
     );
   }
+
   Widget _buildGridShimmer() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -171,6 +209,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       },
     );
   }
+
   Widget _buildListShimmer() {
     return ListView.builder(
       padding: const EdgeInsets.all(8),

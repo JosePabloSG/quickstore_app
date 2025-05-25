@@ -6,7 +6,8 @@ class Product {
   final int categoryId;
   final double rating;
   final int reviews;
-
+  final int stock;
+  final bool hasPriceChanged;
 
   Product({
     required this.id,
@@ -15,7 +16,9 @@ class Product {
     required this.price,
     required this.categoryId,
     required this.rating,
-    required this.reviews
+    required this.reviews,
+    required this.stock,
+    this.hasPriceChanged = false,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -27,6 +30,8 @@ class Product {
       categoryId: json['category']['id'],
       rating: 4.5,
       reviews: 123,
+      stock: json['stock'] ?? 2,
+      hasPriceChanged: json['hasPriceChanged'] ?? false,
 
     );
   }
