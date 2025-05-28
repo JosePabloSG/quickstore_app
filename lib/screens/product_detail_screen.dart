@@ -10,6 +10,7 @@ import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
 import '../widgets/rating_stars.dart';
 import '../utils/notification_helper.dart';
+import '../widgets/review_section.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -69,14 +70,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                '\$${product.price.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+              child:
+                  product.hasPriceChanged
+                      ? Row(
+                        children: [
+                          Text(
+                            '\$${(product.price * 1.25).toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '\$${product.price.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      )
+                      : Text(
+                        '\$${product.price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
             ),
             const SizedBox(height: 8),
             Padding(
@@ -101,7 +125,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam arcu mauris.',
+                product.description,
                 style: const TextStyle(fontSize: 14),
               ),
             ),
@@ -132,6 +156,55 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     quantity = 1;
                   });
                 },
+              ),
+            ),
+            // Specifications
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Specifications',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Text(
+                        'Material: ',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(product.material),
+                      ),
+                      const SizedBox(width: 16),
+                      const Text(
+                        'Origin: ',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(product.origin),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             // Stock
@@ -336,6 +409,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
+            // Sección de Reseñas Detalladas
+            ReviewSection(productId: product.id),
           ],
         ),
       ),
