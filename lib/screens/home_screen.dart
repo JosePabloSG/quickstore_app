@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quickstore_app/screens/login_screen.dart';
+import 'package:quickstore_app/screens/login_email_screen.dart';
 import 'package:quickstore_app/services/auth_service.dart';
 import 'package:quickstore_app/widgets/popular_product.dart';
 import '../providers/product_provider.dart';
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder:
-                          (_) => const LoginScreen(showLogoutMessage: true),
+                          (_) => const LoginEmailScreen(),
                     ),
                     (route) => false,
                   );
