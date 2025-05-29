@@ -6,7 +6,6 @@ import 'rating_stars.dart';
 
 class ReviewSection extends StatefulWidget {
   final String productId;
-
   const ReviewSection({super.key, required this.productId});
 
   @override
@@ -15,7 +14,6 @@ class ReviewSection extends StatefulWidget {
 
 class _ReviewSectionState extends State<ReviewSection> {
   late Future<List<Review>> _reviewsFuture;
-
   @override
   void initState() {
     super.initState();
@@ -23,7 +21,6 @@ class _ReviewSectionState extends State<ReviewSection> {
       widget.productId,
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Review>>(
@@ -35,11 +32,9 @@ class _ReviewSectionState extends State<ReviewSection> {
             child: Center(child: CircularProgressIndicator()),
           );
         }
-
         if (snapshot.hasError) {
           final error = snapshot.error;
           print('Review error: $error');
-
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -48,7 +43,6 @@ class _ReviewSectionState extends State<ReviewSection> {
             ),
           );
         }
-
         final reviews = snapshot.data!;
         if (reviews.isEmpty) {
           return const Padding(
@@ -56,50 +50,48 @@ class _ReviewSectionState extends State<ReviewSection> {
             child: Text('No reviews yet'),
           );
         }
-
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Rating & Reviews',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Rating & Reviews',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) =>
+                                  AllReviewsScreen(productId: widget.productId),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004CFF),
+                      foregroundColor: Colors.white,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(12),
+                      elevation: 4,
+                    ),
+                    child: const Icon(Icons.arrow_forward),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               ...reviews.take(2).map((review) => _buildReviewItem(review)),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (_) =>
-                                AllReviewsScreen(productId: widget.productId),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004CFF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text('View All Reviews'),
-                ),
-              ),
             ],
           ),
         );
       },
     );
   }
-
   Widget _buildReviewItem(Review review) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -130,4 +122,4 @@ class _ReviewSectionState extends State<ReviewSection> {
       ),
     );
   }
-}
+} 

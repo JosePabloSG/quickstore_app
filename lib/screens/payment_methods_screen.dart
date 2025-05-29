@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:quickstore_app/models/product.dart';
 import 'package:quickstore_app/providers/buyNow_provider.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
+import 'package:quickstore_app/widgets/price_row.dart';
 
 class PaymentScreen extends StatelessWidget {
   final bool fromBuyNow;
@@ -112,37 +113,19 @@ class PaymentScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Subtotal:', style: TextStyle(fontSize: 16)),
-                Text('\$${subtotal.toStringAsFixed(2)}'),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Costo de envío:', style: TextStyle(fontSize: 16)),
-                Text('\$${shipping.toStringAsFixed(2)}'),
-              ],
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+           Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      PriceRow(label: 'Subtotal:', value: cart.subtotal),
+                      PriceRow(label: 'Costo de envío:',value: cart.shipping),
+                      const Divider(height: 24),
+                      PriceRow(label:'Total:',value: cart.total, isTotal: true),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-                Text(
-                  '\$${total.toStringAsFixed(2)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
