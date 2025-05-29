@@ -11,6 +11,8 @@ import '../widgets/size_selector.dart';
 import '../widgets/rating_stars.dart';
 import '../utils/notification_helper.dart';
 import '../widgets/review_section.dart';
+import '../screens/image_zoom_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -58,15 +60,34 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Hero(
-              tag: 'product-image-detail-${product.id}',
-              child: Image.network(
-                product.imageUrl,
-                width: double.infinity,
-                height: 280,
-                fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ImageZoomScreen(imageUrl: product.imageUrl),
+                  ),
+                );
+              },
+              child: Hero(
+                tag: 'product-image-detail-${product.id}',
+                child: CachedNetworkImage(
+                  imageUrl: product.imageUrl,
+                  width: double.infinity,
+                  height: 280,
+                  fit: BoxFit.cover,
+                  placeholder:
+                      (context, url) => Container(
+                        color: Colors.grey.shade200,
+                        height: 280,
+                        child: const Center(child: CircularProgressIndicator()),
+                      ),
+                  errorWidget:
+                      (context, url, error) => const Icon(Icons.broken_image),
+                ),
               ),
             ),
+
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
