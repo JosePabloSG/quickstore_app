@@ -5,6 +5,7 @@ import 'package:quickstore_app/providers/buyNow_provider.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
 import 'package:quickstore_app/providers/favorites_provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
+import 'package:quickstore_app/providers/user_provider.dart';
 import 'package:quickstore_app/screens/main_navigation_screen.dart';
 import 'package:quickstore_app/screens/welcome_screen.dart';
 import 'providers/view_mode_provider.dart';
@@ -35,7 +36,8 @@ void main() async {
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (_) => SearchProvider()),
           ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-          ChangeNotifierProvider(create: (_) => BuyNowProvider())
+          ChangeNotifierProvider(create: (_) => BuyNowProvider()),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: const MyApp(),
       ),
