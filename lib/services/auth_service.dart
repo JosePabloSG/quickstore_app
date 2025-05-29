@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   static const _tokenKey = 'auth_token';
@@ -27,13 +29,31 @@ class AuthService {
     }
   }
 
-  Future<User?> signUp(String email, String password) async {
+  Future<User?> signUp(
+    String email,
+    String password, {
+    required String fullName,
+    required String phoneNumber,
+  }) async {
     try {
+      // Crear usuario en Firebase Auth
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       final user = userCredential.user;
       if (user != null) {
+        // Enviar email de verificación
+        await user.sendEmailVerification();
+
+        // Guardar información adicional en Firestore
+        await _firestore.collection('users').doc(user.uid).set({
+          'fullName': fullName,
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Guardar token
         String? token = await user.getIdToken();
         if (token != null) {
           await _secureStorage.write(key: _tokenKey, value: token);
@@ -43,7 +63,7 @@ class AuthService {
       return user;
     } catch (e) {
       print('Error signing up: $e');
-      return null;
+      rethrow;
     }
   }
 
