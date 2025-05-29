@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
@@ -21,15 +22,49 @@ class BottomNavBar extends StatelessWidget {
       unselectedItemColor: const Color(0xFF004CFF),
       type: BottomNavigationBarType.fixed,
       items: [
-        const BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-        const BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            'assets/icons/ShopIcon.svg',
+            colorFilter: ColorFilter.mode(
+              currentIndex == 0 ? Colors.black : const Color(0xFF004CFF),
+              BlendMode.srcIn,
+            ),
+          ),
+          label: '',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            'assets/icons/CategoriesIcon.svg',
+            colorFilter: ColorFilter.mode(
+              currentIndex == 1 ? Colors.black : const Color(0xFF004CFF),
+              BlendMode.srcIn,
+            ),
+          ),
+          label: '',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            'assets/icons/WishlistIcon.svg',
+            colorFilter: ColorFilter.mode(
+              currentIndex == 2 ? Colors.black : const Color(0xFF004CFF),
+              BlendMode.srcIn,
+            ),
+          ),
+          label: '',
+        ),
 
         // Ícono del carrito con badge dinámico
         BottomNavigationBarItem(
           icon: Stack(
             clipBehavior: Clip.none,
             children: [
-              const Icon(Icons.shopping_bag),
+              SvgPicture.asset(
+                'assets/icons/BagIcon.svg',
+                colorFilter: ColorFilter.mode(
+                  currentIndex == 3 ? Colors.black : const Color(0xFF004CFF),
+                  BlendMode.srcIn,
+                ),
+              ),
               Positioned(
                 top: -4,
                 right: -6,
@@ -60,7 +95,16 @@ class BottomNavBar extends StatelessWidget {
           label: '',
         ),
 
-        const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            'assets/icons/ProfileIcon.svg',
+            colorFilter: ColorFilter.mode(
+              currentIndex == 4 ? Colors.black : const Color(0xFF004CFF),
+              BlendMode.srcIn,
+            ),
+          ),
+          label: '',
+        ),
       ],
     );
   }
