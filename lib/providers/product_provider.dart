@@ -14,25 +14,67 @@ class ProductProvider with ChangeNotifier {
   List<Product> _filteredProducts = [];
   List<Product> get filteredProducts => [..._filteredProducts];
 
+  List<Product> _popularProducts = [];
+  List<Product> get popularProducts => [..._popularProducts];
+
+  List<Product> _recommendedProducts = [];
+  List<Product> get recommendedProducts => [..._recommendedProducts];
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _hasMoreItems = true;
+  bool get hasMoreItems => _hasMoreItems;
 
   int? _currentCategoryId;
   int? get currentCategoryId => _currentCategoryId;
 
-  Future<void> fetchProducts() async {
+  int _page = 1;
+  int _itemsPerPage = 10;
+
+  Future<void> fetchProducts({bool refresh = false, int? page}) async {
+    if (refresh) {
+      _page = 1;
+      _hasMoreItems = true;
+      _allProducts.clear();
+      _products.clear();
+      _filteredProducts.clear();
+    }
+
+    if (!_hasMoreItems && !refresh) return;
+
     _isLoading = true;
     notifyListeners();
 
     try {
-      _allProducts = await _apiService.fetchProducts();
+      final newProducts = await _apiService.fetchProducts(
+        page: page ?? _page,
+        limit: _itemsPerPage,
+      );
+      _allProducts.addAll(newProducts);
+
+      // Sort by popularity and set popular products
+      // Sort by popularity for best sellers
+      final sortedByPopularity = List<Product>.from(newProducts)
+        ..sort((a, b) => b.rating.compareTo(a.rating));
+      _popularProducts = sortedByPopularity.take(5).toList();
+
+      // Sort by relevance based on user's history
+      // TODO: Implement actual user history logic
+      _recommendedProducts = List<Product>.from(
+        newProducts,
+      )..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
+      _recommendedProducts = _recommendedProducts.take(5).toList();
+
       if (_currentCategoryId != null) {
-        fetchProductsByCategory(_currentCategoryId!);
+        _updateFilteredProductsByCategory();
       } else {
-        _products = [..._allProducts];
+        _products.addAll(newProducts);
+        _filteredProducts = [..._products];
       }
-      _filteredProducts = [..._products]; // inicializa con todos
-      print('Productos cargados: ${_products.length}');
+
+      _hasMoreItems = newProducts.length >= _itemsPerPage;
+      _page++;
     } catch (e) {
       print('Error al cargar productos: $e');
     }
@@ -41,14 +83,35 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchProductsByCategory(int categoryId) {
-    _currentCategoryId = categoryId;
+  void _updateFilteredProductsByCategory() {
     _products =
         _allProducts
-            .where((product) => product.categoryId == categoryId)
+            .where((product) => product.categoryId == _currentCategoryId)
             .toList();
     _filteredProducts = [..._products];
+  }
+
+  Future<void> fetchProductsByCategory(int categoryId) async {
+    _currentCategoryId = categoryId;
+    _page = 1;
+    _hasMoreItems = true;
+    _products.clear();
+    _filteredProducts.clear();
+
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final products = await _apiService.fetchProductsByCategory(categoryId);
+      _products = products;
+      _filteredProducts = [...products];
+      _hasMoreItems = products.length >= _itemsPerPage;
+    } catch (e) {
+      print('Error fetching products by category: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void filterProducts(String query) {
@@ -68,6 +131,8 @@ class ProductProvider with ChangeNotifier {
 
   void resetProducts() {
     _currentCategoryId = null;
+    _page = 1;
+    _hasMoreItems = true;
     _products = [..._allProducts];
     _filteredProducts = [..._products];
     notifyListeners();

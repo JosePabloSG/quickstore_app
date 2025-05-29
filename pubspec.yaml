@@ -48,6 +48,7 @@ dev_dependencies:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
+
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
@@ -63,6 +64,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/Images/logo.png
     - assets/Images/Bubbles_register.svg
@@ -70,6 +73,11 @@ flutter:
     - assets/Images/cart.png
     - assets/Images/Mastercard.svg
     - assets/Images/Visa.svg
+    - assets/icons/BagIcon.svg
+    - assets/icons/CategoriesIcon.svg
+    - assets/icons/ProfileIcon.svg
+    - assets/icons/ShopIcon.svg
+    - assets/icons/WishlistIcon.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
