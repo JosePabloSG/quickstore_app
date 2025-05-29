@@ -8,13 +8,11 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
-import '../widgets/rating_stars.dart';
 import '../utils/notification_helper.dart';
 import '../widgets/review_section.dart';
-import '../screens/image_zoom_screen.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
 
@@ -27,7 +25,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool isFavorite = false;
   String selectedColor = 'Pink';
   String selectedSize = 'M';
-
   final Map<String, int> stockByVariant = {
     'Pink-M': 5,
     'Pink-L': 2,
@@ -35,7 +32,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'Black-M': 3,
     'Green-M': 4,
   };
-
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -60,34 +56,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ImageZoomScreen(imageUrl: product.imageUrl),
-                  ),
-                );
-              },
-              child: Hero(
-                tag: 'product-image-detail-${product.id}',
-                child: CachedNetworkImage(
-                  imageUrl: product.imageUrl,
-                  width: double.infinity,
-                  height: 280,
-                  fit: BoxFit.cover,
-                  placeholder:
-                      (context, url) => Container(
-                        color: Colors.grey.shade200,
-                        height: 280,
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                  errorWidget:
-                      (context, url, error) => const Icon(Icons.broken_image),
-                ),
+            Hero(
+              tag: 'product-image-detail-${product.id}',
+              child: Image.network(
+                product.imageUrl,
+                width: double.infinity,
+                height: 280,
+                fit: BoxFit.cover,
               ),
             ),
-
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -131,16 +108,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
             ),
-            //Rating
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: RatingStars(
-                rating: product.rating,
-                reviewCount: product.reviews,
-              ),
-            ),
-
             //description
             const SizedBox(height: 12),
             Padding(
@@ -151,7 +118,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
             // Color selector
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -267,6 +233,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
+            // Sección de Reseñas Detalladas
+            ReviewSection(productId: product.id),
             // Buttons
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -430,8 +398,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
-            // Sección de Reseñas Detalladas
-            ReviewSection(productId: product.id),
+            
           ],
         ),
       ),
