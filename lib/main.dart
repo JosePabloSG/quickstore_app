@@ -5,8 +5,8 @@ import 'package:quickstore_app/providers/buyNow_provider.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
 import 'package:quickstore_app/providers/favorites_provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
-import 'package:quickstore_app/screens/login_screen.dart';
 import 'package:quickstore_app/screens/main_navigation_screen.dart';
+import 'package:quickstore_app/screens/welcome_screen.dart';
 import 'providers/view_mode_provider.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData) {
             return const MainNavigationScreen(); // aquí menu
           }
-          return const LoginScreen();
+          return const WelcomeScreen();
         },
       ),
     );
