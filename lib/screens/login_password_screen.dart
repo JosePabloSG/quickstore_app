@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'product_catalog_screen.dart';
+import 'main_navigation_screen.dart';
 
 class LoginPasswordScreen extends StatefulWidget {
   final String email;
@@ -20,12 +20,16 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> {
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      final user = await _authService.signIn(widget.email, _passwordController.text);
+      final user = await _authService.signIn(
+        widget.email,
+        _passwordController.text,
+      );
       setState(() => _isLoading = false);
 
       if (user != null && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ProductCatalogScreen()),
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+          (route) => false,
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,12 +149,12 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> {
                             style: TextStyle(color: Colors.black54),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -21,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -68,8 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Cerrar sesión'),
+              enabled: !_isLoading,
+              leading:
+                  _isLoading
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.logout),
+              title: Text(_isLoading ? 'Cerrando sesión...' : 'Cerrar sesión'),
               onTap: () async {
                 final shouldLogout = await showDialog<bool>(
                   context: context,
@@ -93,15 +103,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
 
                 if (shouldLogout == true) {
-                  await AuthService().signOut();
-                  if (!context.mounted) return;
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder:
-                          (_) => const LoginEmailScreen(),
-                    ),
-                    (route) => false,
-                  );
+                  try {
+                    setState(() => _isLoading = true);
+
+                    // First disable any UI interactions
+                    await Future.microtask(() {});
+
+                    // Then sign out
+                    await AuthService().signOut();
+
+                    if (!context.mounted) return;
+
+                    // Finally navigate and reset stack
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const LoginEmailScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Error al cerrar sesión. Intenta de nuevo.',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } finally {
+                    if (mounted) {
+                      setState(() => _isLoading = false);
+                    }
+                  }
                 }
               },
             ),

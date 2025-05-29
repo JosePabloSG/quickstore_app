@@ -49,10 +49,17 @@ class AuthService {
 
   Future<void> signOut() async {
     try {
+      // First, prevent any new token refreshes
       await _firebaseAuth.signOut();
+
+      // Then clean up stored tokens
       await _secureStorage.delete(key: _tokenKey);
+
+      // Give time for Firebase to clean up internal state
+      await Future.delayed(const Duration(milliseconds: 300));
     } catch (e) {
       print('Error signing out: $e');
+      rethrow;
     }
   }
 
