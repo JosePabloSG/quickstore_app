@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quickstore_app/screens/cart_screen.dart';
 import 'package:quickstore_app/screens/favorites_screen.dart';
-import 'package:quickstore_app/screens/product_catalog_screen.dart';
 import 'package:quickstore_app/screens/profile_screen.dart';
 import 'package:quickstore_app/widgets/botton_navBar.dart';
 import 'home_screen.dart';
@@ -24,7 +23,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     FavoritesScreen(onBack: () {}), // No necesitamos onBack aquí
-    const ProductCatalogScreen(),
     CartScreen(onBack: () {}), // No necesitamos onBack aquí
     const ProfileScreen(),
   ];

@@ -23,7 +23,6 @@ class BottomNavBar extends StatelessWidget {
       items: [
         const BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
         const BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
-        const BottomNavigationBarItem(icon: Icon(Icons.list), label: ''),
 
         // Ícono del carrito con badge dinámico
         BottomNavigationBarItem(
