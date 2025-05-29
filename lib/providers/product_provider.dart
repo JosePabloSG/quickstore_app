@@ -20,6 +20,15 @@ class ProductProvider with ChangeNotifier {
   List<Product> _recommendedProducts = [];
   List<Product> get recommendedProducts => [..._recommendedProducts];
 
+  //Filtros avanzados
+  double? _minPrice;
+  double? _maxPrice;
+  List<int> _selectedCategoryIds = [];
+  double? _minRating;
+  bool _onlyInStock = false;
+  bool _onlyWithDiscount = false;
+  //Filtros avanzados
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -126,6 +135,53 @@ class ProductProvider with ChangeNotifier {
               )
               .toList();
     }
+    notifyListeners();
+  }
+
+  //Metodo para establecer filtros avanzados
+  void setAdvancedFilters({
+    double? minPrice,
+    double? maxPrice,
+    List<int>? categoryIds,
+    double? minRating,
+    bool? onlyInStock,
+    bool? onlyWithDiscount,
+  }) {
+    _minPrice = minPrice;
+    _maxPrice = maxPrice;
+    _selectedCategoryIds = categoryIds ?? [];
+    _minRating = minRating;
+    _onlyInStock = onlyInStock ?? false;
+    _onlyWithDiscount = onlyWithDiscount ?? false;
+    applyAdvancedFilters();
+  }
+
+  //Metodo para aplicar los filtros avanzados
+  void applyAdvancedFilters() {
+    _filteredProducts =
+        _allProducts.where((product) {
+          final matchesPrice =
+              (_minPrice == null || product.price >= _minPrice!) &&
+              (_maxPrice == null || product.price <= _maxPrice!);
+
+          final matchesCategory =
+              _selectedCategoryIds.isEmpty ||
+              _selectedCategoryIds.contains(product.categoryId);
+
+          final matchesRating =
+              _minRating == null || product.rating >= _minRating!;
+
+          final matchesStock = !_onlyInStock || product.stock > 0;
+
+          final matchesDiscount = !_onlyWithDiscount || product.hasPriceChanged;
+
+          return matchesPrice &&
+              matchesCategory &&
+              matchesRating &&
+              matchesStock &&
+              matchesDiscount;
+        }).toList();
+
     notifyListeners();
   }
 
