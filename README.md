@@ -8,7 +8,7 @@
 - **Backend:** Firebase (Authentication, Firestore, Storage)
 - **Gestión de Estado:** GetX
 - **Base de Datos Local:** shared_preferences, SQLite
-- **Dependencias adicionales:** 
+- **Dependencias adicionales:**
   - cached_network_image
   - carousel_slider
   - flutter_rating_bar
@@ -49,38 +49,41 @@ El flujo es unidireccional: **UI → Controllers (GetX Observables).**
 ---
 
 # 👥 Participantes
+
 - [@JosePabloSG](https://github.com/JosePabloSG)
 - [@Yoilin](https://github.com/YoilinCastrillo)
 - [@Sofia](https://github.com/SofiaSJ09)
 - [@Aaron](https://github.com/ItsChavesCR)
 - [@Genesis](https://github.com/AlexaGenar)
+
 ---
 
-# 🌱 ¿Cómo colaborar y subir cambios? (GitFlow para `develop`)
+# 🌱 ¿Cómo colaborar y subir cambios? (Flujo para `main`)
 
 **Pasos para trabajar de forma ordenada:**
 
 ### 1. Clona el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/quickstore.git
-cd quickstore
+git clone https://github.com/JosePabloSG/quickstore_app.git
+cd quickstore_app
+git checkout main
+git pull origin main
 ```
 
-### 2. Crea una rama de desarrollo desde `develop`
+### 2. Crea una rama de desarrollo desde `main`
 
 ```bash
-git checkout develop
-git pull origin develop
 git checkout -b feature/nombre-del-feature
 ```
 
-**Ejemplo de nombres de ramas:**  
+**Ejemplo de nombres de ramas:**
+
 - `feature/login-authentication`
 - `feature/product-listing`
 - `bugfix/fix-cart-bug`
 
-### 3. Sube tus cambios a `develop`
+### 3. Sube tus cambios a tu rama
 
 ```bash
 git add .
@@ -88,8 +91,73 @@ git commit -m "feat: agregada funcionalidad de favoritos"
 git push origin feature/nombre-del-feature
 ```
 
-### 4. Crea un Pull Request (PR) hacia `develop`
+### 4. Crea un Pull Request (PR) hacia `main`
 
-- El PR debe ser revisado y aprobado antes de hacer *merge*.
+- El PR debe ser revisado y aprobado antes de hacer _merge_.
 
+---
 
+# 🏁 Cómo arrancar el proyecto (macOS y Windows)
+
+Después de clonar el repositorio, sigue estos pasos para ejecutar la app en tu entorno local:
+
+## 1. Instala Flutter
+
+Asegúrate de tener [Flutter](https://docs.flutter.dev/get-started/install) instalado y configurado en tu sistema (incluye Dart SDK). Puedes verificarlo con:
+
+```bash
+flutter --version
+```
+
+## 2. Instala dependencias
+
+Desde la raíz del proyecto:
+
+```bash
+flutter pub get
+```
+
+## 3. Ejecuta la app
+
+### En macOS
+
+- Conecta un simulador o dispositivo físico (iOS o Android).
+- Ejecuta:
+
+```bash
+flutter run
+```
+
+### En Windows
+
+- Conecta un emulador o dispositivo físico (Android).
+- Ejecuta:
+
+```bash
+flutter run
+```
+
+> **Nota:** Para iOS necesitas una Mac con Xcode instalado. Para Android, asegúrate de tener Android Studio y los emuladores configurados.
+
+## 4. Solución de problemas
+
+- Si tienes problemas con dependencias nativas, ejecuta:
+  ```bash
+  flutter clean
+  flutter pub get
+  ```
+- Si usas Firebase, asegúrate de tener los archivos `google-services.json` (Android) y/o `GoogleService-Info.plist` (iOS) en las carpetas correspondientes.
+
+---
+
+# ⚠️ Requisitos y consideraciones para correr el proyecto
+
+- **Solo Android:** Esta app está preparada únicamente para ejecutarse en dispositivos Android.
+- **Versión mínima:** Android 16 (Jelly Bean) o superior.
+- **Dispositivo:** Debes conectar un dispositivo físico Android o tener un emulador configurado.
+- **Rama principal:** Asegúrate de estar en la rama `main` antes de instalar dependencias y ejecutar la app:
+
+```bash
+git checkout main
+git pull origin main
+```
