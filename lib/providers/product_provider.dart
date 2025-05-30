@@ -20,14 +20,13 @@ class ProductProvider with ChangeNotifier {
   List<Product> _recommendedProducts = [];
   List<Product> get recommendedProducts => [..._recommendedProducts];
 
-  //Filtros avanzados
+  // Filtros avanzados
   double? _minPrice;
   double? _maxPrice;
   List<int> _selectedCategoryIds = [];
   double? _minRating;
   bool _onlyInStock = false;
   bool _onlyWithDiscount = false;
-  //Filtros avanzados
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -62,17 +61,12 @@ class ProductProvider with ChangeNotifier {
       );
       _allProducts.addAll(newProducts);
 
-      // Sort by popularity and set popular products
-      // Sort by popularity for best sellers
       final sortedByPopularity = List<Product>.from(newProducts)
         ..sort((a, b) => b.rating.compareTo(a.rating));
       _popularProducts = sortedByPopularity.take(5).toList();
 
-      // Sort by relevance based on user's history
-      // TODO: Implement actual user history logic
-      _recommendedProducts = List<Product>.from(
-        newProducts,
-      )..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
+      _recommendedProducts = List<Product>.from(newProducts)
+        ..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
       _recommendedProducts = _recommendedProducts.take(5).toList();
 
       if (_currentCategoryId != null) {
@@ -93,52 +87,65 @@ class ProductProvider with ChangeNotifier {
   }
 
   void _updateFilteredProductsByCategory() {
-    _products =
-        _allProducts
-            .where((product) => product.categoryId == _currentCategoryId)
-            .toList();
+    _products = _allProducts
+        .where((product) => product.categoryId == _currentCategoryId)
+        .toList();
     _filteredProducts = [..._products];
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
+    if (_currentCategoryId == categoryId && _products.isNotEmpty) return;
+
     _currentCategoryId = categoryId;
     _page = 1;
     _hasMoreItems = true;
     _products.clear();
     _filteredProducts.clear();
+    _allProducts.clear();
 
     _isLoading = true;
     notifyListeners();
 
     try {
-      final products = await _apiService.fetchProductsByCategory(categoryId);
-      _products = products;
-      _filteredProducts = [...products];
-      _hasMoreItems = products.length >= _itemsPerPage;
+      final List<Product> products = await _apiService.fetchProductsByCategory(
+        categoryId,
+        limit: _itemsPerPage,
+      );
+
+      if (products.isNotEmpty) {
+        _products = products;
+        _filteredProducts = [...products];
+        _allProducts = [...products];
+        _hasMoreItems = products.length >= _itemsPerPage;
+
+        final sortedByPopularity = List<Product>.from(products)
+          ..sort((a, b) => b.rating.compareTo(a.rating));
+        _popularProducts = sortedByPopularity.take(5).toList();
+
+        final recommendedProducts = List<Product>.from(products)
+          ..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
+        _recommendedProducts = recommendedProducts.take(5).toList();
+      }
     } catch (e) {
       print('Error fetching products by category: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void filterProducts(String query) {
     if (query.isEmpty) {
       _filteredProducts = [..._products];
     } else {
-      _filteredProducts =
-          _products
-              .where(
-                (product) =>
-                    product.title.toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
+      _filteredProducts = _products
+          .where((product) =>
+              product.title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     }
     notifyListeners();
   }
 
-  //Metodo para establecer filtros avanzados
   void setAdvancedFilters({
     double? minPrice,
     double? maxPrice,
@@ -156,41 +163,39 @@ class ProductProvider with ChangeNotifier {
     applyAdvancedFilters();
   }
 
-  //Metodo para aplicar los filtros avanzados
   void applyAdvancedFilters() {
-    _filteredProducts =
-        _allProducts.where((product) {
-          final matchesPrice =
-              (_minPrice == null || product.price >= _minPrice!) &&
-              (_maxPrice == null || product.price <= _maxPrice!);
+    _filteredProducts = _allProducts.where((product) {
+      final matchesPrice = (_minPrice == null || product.price >= _minPrice!) &&
+          (_maxPrice == null || product.price <= _maxPrice!);
 
-          final matchesCategory =
-              _selectedCategoryIds.isEmpty ||
-              _selectedCategoryIds.contains(product.categoryId);
+      final matchesCategory = _selectedCategoryIds.isEmpty ||
+          _selectedCategoryIds.contains(product.categoryId);
 
-          final matchesRating =
-              _minRating == null || product.rating >= _minRating!;
+      final matchesRating =
+          _minRating == null || product.rating >= _minRating!;
 
-          final matchesStock = !_onlyInStock || product.stock > 0;
+      final matchesStock = !_onlyInStock || product.stock > 0;
 
-          final matchesDiscount = !_onlyWithDiscount || product.hasPriceChanged;
+      final matchesDiscount =
+          !_onlyWithDiscount || product.hasPriceChanged;
 
-          return matchesPrice &&
-              matchesCategory &&
-              matchesRating &&
-              matchesStock &&
-              matchesDiscount;
-        }).toList();
+      return matchesPrice &&
+          matchesCategory &&
+          matchesRating &&
+          matchesStock &&
+          matchesDiscount;
+    }).toList();
 
     notifyListeners();
   }
 
-  void resetProducts() {
+  Future<void> resetProducts() async {
     _currentCategoryId = null;
     _page = 1;
     _hasMoreItems = true;
-    _products = [..._allProducts];
-    _filteredProducts = [..._products];
-    notifyListeners();
+    _products.clear();
+    _filteredProducts.clear();
+    _allProducts.clear();
+    await fetchProducts(refresh: true);
   }
 }
