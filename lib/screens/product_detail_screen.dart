@@ -8,11 +8,11 @@ import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
-import '../widgets/rating_stars.dart';
 import '../utils/notification_helper.dart';
 import '../widgets/review_section.dart';
 
 class ProductDetailScreen extends StatefulWidget {
+
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
 
@@ -25,7 +25,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool isFavorite = false;
   String selectedColor = 'Pink';
   String selectedSize = 'M';
-
   final Map<String, int> stockByVariant = {
     'Pink-M': 5,
     'Pink-L': 2,
@@ -33,7 +32,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     'Black-M': 3,
     'Green-M': 4,
   };
-
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -110,16 +108,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
             ),
-            //Rating
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: RatingStars(
-                rating: product.rating,
-                reviewCount: product.reviews,
-              ),
-            ),
-
             //description
             const SizedBox(height: 12),
             Padding(
@@ -130,7 +118,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
             const SizedBox(height: 12),
-
             // Color selector
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -246,6 +233,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
+            // Sección de Reseñas Detalladas
+            ReviewSection(productId: product.id),
             // Buttons
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -409,8 +398,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
-            // Sección de Reseñas Detalladas
-            ReviewSection(productId: product.id),
+            
           ],
         ),
       ),

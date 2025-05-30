@@ -13,6 +13,7 @@ import '../widgets_shimmer/product_grid_item_shimmer.dart';
 import '../widgets/search_bar.dart';
 import '../providers/search_provider.dart';
 import '../widgets/search_history_list.dart';
+import '../widgets/filter_chips_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -174,6 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
               categoryProvider.isLoading
                   ? const CategoryMenuShimmer()
                   : const CategoryMenu(),
+              const SizedBox(height: 12),
+              const FilterChipsBar(), // Aquí se inserta la barra de filtros horizontal
               const SizedBox(height: 20),
               const Text(
                 'Most Popular',
@@ -183,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.black,
                 ),
               ),
+
               const SizedBox(height: 8),
               SizedBox(
                 height: 160,

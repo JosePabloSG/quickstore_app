@@ -20,6 +20,14 @@ class ProductProvider with ChangeNotifier {
   List<Product> _recommendedProducts = [];
   List<Product> get recommendedProducts => [..._recommendedProducts];
 
+  // Filtros avanzados
+  double? _minPrice;
+  double? _maxPrice;
+  List<int> _selectedCategoryIds = [];
+  double? _minRating;
+  bool _onlyInStock = false;
+  bool _onlyWithDiscount = false;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -53,17 +61,12 @@ class ProductProvider with ChangeNotifier {
       );
       _allProducts.addAll(newProducts);
 
-      // Sort by popularity and set popular products
-      // Sort by popularity for best sellers
       final sortedByPopularity = List<Product>.from(newProducts)
         ..sort((a, b) => b.rating.compareTo(a.rating));
       _popularProducts = sortedByPopularity.take(5).toList();
 
-      // Sort by relevance based on user's history
-      // TODO: Implement actual user history logic
-      _recommendedProducts = List<Product>.from(
-        newProducts,
-      )..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
+      _recommendedProducts = List<Product>.from(newProducts)
+        ..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
       _recommendedProducts = _recommendedProducts.take(5).toList();
 
       if (_currentCategoryId != null) {
@@ -84,18 +87,14 @@ class ProductProvider with ChangeNotifier {
   }
 
   void _updateFilteredProductsByCategory() {
-    _products =
-        _allProducts
-            .where((product) => product.categoryId == _currentCategoryId)
-            .toList();
+    _products = _allProducts
+        .where((product) => product.categoryId == _currentCategoryId)
+        .toList();
     _filteredProducts = [..._products];
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
-    if (_currentCategoryId == categoryId && _products.isNotEmpty) {
-      // Si ya estamos mostrando esta categoría, no hacemos nada
-      return;
-    }
+    if (_currentCategoryId == categoryId && _products.isNotEmpty) return;
 
     _currentCategoryId = categoryId;
     _page = 1;
@@ -115,19 +114,16 @@ class ProductProvider with ChangeNotifier {
 
       if (products.isNotEmpty) {
         _products = products;
-        _filteredProducts = products;
-        _allProducts = products;
+        _filteredProducts = [...products];
+        _allProducts = [...products];
         _hasMoreItems = products.length >= _itemsPerPage;
 
-        // También actualizar productos populares y recomendados de esta categoría
-        var popularProducts = List<Product>.from(products);
-        popularProducts.sort((a, b) => b.rating.compareTo(a.rating));
-        _popularProducts = popularProducts.take(5).toList();
+        final sortedByPopularity = List<Product>.from(products)
+          ..sort((a, b) => b.rating.compareTo(a.rating));
+        _popularProducts = sortedByPopularity.take(5).toList();
 
-        var recommendedProducts = List<Product>.from(products);
-        recommendedProducts.sort(
-          (a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating),
-        );
+        final recommendedProducts = List<Product>.from(products)
+          ..sort((a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating));
         _recommendedProducts = recommendedProducts.take(5).toList();
       }
     } catch (e) {
@@ -142,14 +138,54 @@ class ProductProvider with ChangeNotifier {
     if (query.isEmpty) {
       _filteredProducts = [..._products];
     } else {
-      _filteredProducts =
-          _products
-              .where(
-                (product) =>
-                    product.title.toLowerCase().contains(query.toLowerCase()),
-              )
-              .toList();
+      _filteredProducts = _products
+          .where((product) =>
+              product.title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     }
+    notifyListeners();
+  }
+
+  void setAdvancedFilters({
+    double? minPrice,
+    double? maxPrice,
+    List<int>? categoryIds,
+    double? minRating,
+    bool? onlyInStock,
+    bool? onlyWithDiscount,
+  }) {
+    _minPrice = minPrice;
+    _maxPrice = maxPrice;
+    _selectedCategoryIds = categoryIds ?? [];
+    _minRating = minRating;
+    _onlyInStock = onlyInStock ?? false;
+    _onlyWithDiscount = onlyWithDiscount ?? false;
+    applyAdvancedFilters();
+  }
+
+  void applyAdvancedFilters() {
+    _filteredProducts = _allProducts.where((product) {
+      final matchesPrice = (_minPrice == null || product.price >= _minPrice!) &&
+          (_maxPrice == null || product.price <= _maxPrice!);
+
+      final matchesCategory = _selectedCategoryIds.isEmpty ||
+          _selectedCategoryIds.contains(product.categoryId);
+
+      final matchesRating =
+          _minRating == null || product.rating >= _minRating!;
+
+      final matchesStock = !_onlyInStock || product.stock > 0;
+
+      final matchesDiscount =
+          !_onlyWithDiscount || product.hasPriceChanged;
+
+      return matchesPrice &&
+          matchesCategory &&
+          matchesRating &&
+          matchesStock &&
+          matchesDiscount;
+    }).toList();
+
     notifyListeners();
   }
 
@@ -160,9 +196,6 @@ class ProductProvider with ChangeNotifier {
     _products.clear();
     _filteredProducts.clear();
     _allProducts.clear();
-
-    // En lugar de llamar a fetchProducts directamente,
-    // usamos el método de la clase con refresh = true
     await fetchProducts(refresh: true);
   }
 }
