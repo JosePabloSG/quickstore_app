@@ -8,7 +8,7 @@
 - **Backend:** Firebase (Authentication, Firestore, Storage)
 - **Gestión de Estado:** GetX
 - **Base de Datos Local:** shared_preferences, SQLite
-- **Dependencias adicionales:** 
+- **Dependencias adicionales:**
   - cached_network_image
   - carousel_slider
   - flutter_rating_bar
@@ -49,11 +49,13 @@ El flujo es unidireccional: **UI → Controllers (GetX Observables).**
 ---
 
 # 👥 Participantes
+
 - [@JosePabloSG](https://github.com/JosePabloSG)
 - [@Yoilin](https://github.com/YoilinCastrillo)
 - [@Sofia](https://github.com/SofiaSJ09)
 - [@Aaron](https://github.com/ItsChavesCR)
 - [@Genesis](https://github.com/AlexaGenar)
+
 ---
 
 # 🌱 ¿Cómo colaborar y subir cambios? (GitFlow para `develop`)
@@ -63,9 +65,63 @@ El flujo es unidireccional: **UI → Controllers (GetX Observables).**
 ### 1. Clona el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/quickstore.git
-cd quickstore
+git clone https://github.com/JosePabloSG/quickstore_app.git
+cd quickstore_app
 ```
+
+# 🏁 Cómo arrancar el proyecto (macOS y Windows)
+
+Después de clonar el repositorio, sigue estos pasos para ejecutar la app en tu entorno local:
+
+## 1. Instala Flutter
+
+Asegúrate de tener [Flutter](https://docs.flutter.dev/get-started/install) instalado y configurado en tu sistema (incluye Dart SDK). Puedes verificarlo con:
+
+```bash
+flutter --version
+```
+
+## 2. Instala dependencias
+
+Desde la raíz del proyecto:
+
+```bash
+flutter pub get
+```
+
+## 3. Ejecuta la app
+
+### En macOS
+
+- Conecta un simulador o dispositivo físico (iOS o Android).
+- Ejecuta:
+
+```bash
+flutter run
+```
+
+### En Windows
+
+- Conecta un emulador o dispositivo físico (Android).
+- Ejecuta:
+
+```bash
+flutter run
+```
+
+> **Nota:** Para iOS necesitas una Mac con Xcode instalado. Para Android, asegúrate de tener Android Studio y los emuladores configurados.
+
+## 4. Solución de problemas
+
+- Si tienes problemas con dependencias nativas, ejecuta:
+  ```bash
+  flutter clean
+  flutter pub get
+  ```
+- Si usas Firebase, asegúrate de tener los archivos `google-services.json` (Android) y/o `GoogleService-Info.plist` (iOS) en las carpetas correspondientes.
+
+---
+
 
 ### 2. Crea una rama de desarrollo desde `develop`
 
@@ -75,7 +131,8 @@ git pull origin develop
 git checkout -b feature/nombre-del-feature
 ```
 
-**Ejemplo de nombres de ramas:**  
+**Ejemplo de nombres de ramas:**
+
 - `feature/login-authentication`
 - `feature/product-listing`
 - `bugfix/fix-cart-bug`
@@ -90,6 +147,5 @@ git push origin feature/nombre-del-feature
 
 ### 4. Crea un Pull Request (PR) hacia `develop`
 
-- El PR debe ser revisado y aprobado antes de hacer *merge*.
-
+- El PR debe ser revisado y aprobado antes de hacer _merge_.
 
