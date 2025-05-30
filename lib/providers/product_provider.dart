@@ -92,26 +92,50 @@ class ProductProvider with ChangeNotifier {
   }
 
   Future<void> fetchProductsByCategory(int categoryId) async {
+    if (_currentCategoryId == categoryId && _products.isNotEmpty) {
+      // Si ya estamos mostrando esta categoría, no hacemos nada
+      return;
+    }
+
     _currentCategoryId = categoryId;
     _page = 1;
     _hasMoreItems = true;
     _products.clear();
     _filteredProducts.clear();
+    _allProducts.clear();
 
     _isLoading = true;
     notifyListeners();
 
     try {
-      final products = await _apiService.fetchProductsByCategory(categoryId);
-      _products = products;
-      _filteredProducts = [...products];
-      _hasMoreItems = products.length >= _itemsPerPage;
+      final List<Product> products = await _apiService.fetchProductsByCategory(
+        categoryId,
+        limit: _itemsPerPage,
+      );
+
+      if (products.isNotEmpty) {
+        _products = products;
+        _filteredProducts = products;
+        _allProducts = products;
+        _hasMoreItems = products.length >= _itemsPerPage;
+
+        // También actualizar productos populares y recomendados de esta categoría
+        var popularProducts = List<Product>.from(products);
+        popularProducts.sort((a, b) => b.rating.compareTo(a.rating));
+        _popularProducts = popularProducts.take(5).toList();
+
+        var recommendedProducts = List<Product>.from(products);
+        recommendedProducts.sort(
+          (a, b) => (b.reviews * b.rating).compareTo(a.reviews * a.rating),
+        );
+        _recommendedProducts = recommendedProducts.take(5).toList();
+      }
     } catch (e) {
       print('Error fetching products by category: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void filterProducts(String query) {
@@ -129,12 +153,16 @@ class ProductProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetProducts() {
+  Future<void> resetProducts() async {
     _currentCategoryId = null;
     _page = 1;
     _hasMoreItems = true;
-    _products = [..._allProducts];
-    _filteredProducts = [..._products];
-    notifyListeners();
+    _products.clear();
+    _filteredProducts.clear();
+    _allProducts.clear();
+
+    // En lugar de llamar a fetchProducts directamente,
+    // usamos el método de la clase con refresh = true
+    await fetchProducts(refresh: true);
   }
 }

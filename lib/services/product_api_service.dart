@@ -22,7 +22,7 @@ class ProductApiService {
     int limit = 10,
   }) async {
     final response = await _dio.get(
-      '/products',
+      '/Products',
       queryParameters: {'categoryId': categoryId, 'page': page, 'limit': limit},
     );
     return (response.data as List)
@@ -32,7 +32,7 @@ class ProductApiService {
 
   Future<List<Product>> fetchPopularProducts({int limit = 5}) async {
     final response = await _dio.get(
-      '/products',
+      '/Products',
       queryParameters: {'sortBy': 'rating', 'order': 'desc', 'limit': limit},
     );
     return (response.data as List)
