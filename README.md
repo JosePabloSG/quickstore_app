@@ -58,7 +58,7 @@ El flujo es unidireccional: **UI → Controllers (GetX Observables).**
 
 ---
 
-# 🌱 ¿Cómo colaborar y subir cambios? (GitFlow para `develop`)
+# 🌱 ¿Cómo colaborar y subir cambios? (Flujo para `main`)
 
 **Pasos para trabajar de forma ordenada:**
 
@@ -67,7 +67,35 @@ El flujo es unidireccional: **UI → Controllers (GetX Observables).**
 ```bash
 git clone https://github.com/JosePabloSG/quickstore_app.git
 cd quickstore_app
+git checkout main
+git pull origin main
 ```
+
+### 2. Crea una rama de desarrollo desde `main`
+
+```bash
+git checkout -b feature/nombre-del-feature
+```
+
+**Ejemplo de nombres de ramas:**
+
+- `feature/login-authentication`
+- `feature/product-listing`
+- `bugfix/fix-cart-bug`
+
+### 3. Sube tus cambios a tu rama
+
+```bash
+git add .
+git commit -m "feat: agregada funcionalidad de favoritos"
+git push origin feature/nombre-del-feature
+```
+
+### 4. Crea un Pull Request (PR) hacia `main`
+
+- El PR debe ser revisado y aprobado antes de hacer _merge_.
+
+---
 
 # 🏁 Cómo arrancar el proyecto (macOS y Windows)
 
@@ -122,30 +150,14 @@ flutter run
 
 ---
 
+# ⚠️ Requisitos y consideraciones para correr el proyecto
 
-### 2. Crea una rama de desarrollo desde `develop`
-
-```bash
-git checkout develop
-git pull origin develop
-git checkout -b feature/nombre-del-feature
-```
-
-**Ejemplo de nombres de ramas:**
-
-- `feature/login-authentication`
-- `feature/product-listing`
-- `bugfix/fix-cart-bug`
-
-### 3. Sube tus cambios a `develop`
+- **Solo Android:** Esta app está preparada únicamente para ejecutarse en dispositivos Android.
+- **Versión mínima:** Android 16 (Jelly Bean) o superior.
+- **Dispositivo:** Debes conectar un dispositivo físico Android o tener un emulador configurado.
+- **Rama principal:** Asegúrate de estar en la rama `main` antes de instalar dependencias y ejecutar la app:
 
 ```bash
-git add .
-git commit -m "feat: agregada funcionalidad de favoritos"
-git push origin feature/nombre-del-feature
+git checkout main
+git pull origin main
 ```
-
-### 4. Crea un Pull Request (PR) hacia `develop`
-
-- El PR debe ser revisado y aprobado antes de hacer _merge_.
-
