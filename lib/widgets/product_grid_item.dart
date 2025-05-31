@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:quickstore_app/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
+import '../screens/image_zoom_screen.dart';
 
 class ProductGridItem extends StatelessWidget {
   final Product product;
@@ -11,14 +14,21 @@ class ProductGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final cacheSize = screenWidth <= 360 ? 180 : screenWidth <= 600 ? 280 : 350;
+    final cacheSize =
+        screenWidth <= 360
+            ? 180
+            : screenWidth <= 600
+            ? 280
+            : 350;
 
     final bool hasDiscount = product.hasPriceChanged;
     final double originalPrice = product.price;
-    final double discountedPrice = hasDiscount ? originalPrice * 0.75 : originalPrice;
-    final int discountPercent = hasDiscount
-        ? ((1 - (discountedPrice / originalPrice)) * 100).round()
-        : 0;
+    final double discountedPrice =
+        hasDiscount ? originalPrice * 0.75 : originalPrice;
+    final int discountPercent =
+        hasDiscount
+            ? ((1 - (discountedPrice / originalPrice)) * 100).round()
+            : 0;
 
     return GestureDetector(
       onTap: () {
@@ -55,33 +65,36 @@ class ProductGridItem extends StatelessWidget {
                     ),
                     child: CachedNetworkImage(
                       imageUrl: product.imageUrl,
-                      height: 
-                       120, // Reduje ligeramente la altura para prevenir overflow
+                      height: 120,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       memCacheHeight: cacheSize,
                       memCacheWidth: cacheSize,
-                      placeholder: 
-                      (context, url) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
+                      placeholder:
+                          (context, url) => Container(
+                            color: Colors.grey.shade200,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
                       errorWidget:
-                       (context, url, error) => Container(
-                        color: Colors.grey.shade300,
-                        child: const Icon(Icons.broken_image),
-                      ),
+                          (context, url, error) => Container(
+                            color: Colors.grey.shade300,
+                            child: const Icon(Icons.broken_image),
+                          ),
                     ),
                   ),
                 ),
+
                 if (hasDiscount)
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
                         borderRadius: BorderRadius.circular(8),
@@ -96,8 +109,64 @@ class ProductGridItem extends StatelessWidget {
                       ),
                     ),
                   ),
+                // Nuevo boton de añadir al carrito
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () {
+                      final cartProvider = Provider.of<CartProvider>(
+                        context,
+                        listen: false,
+                      );
+                      cartProvider.addToCart(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${product.title} añadido al carrito',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: Color(
+                            0xFF004CFF,
+                          ), // Celeste llamativo (mismo tono de tu botón principal)
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.all(16),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 18,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -119,34 +188,34 @@ class ProductGridItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     hasDiscount
                         ? Row(
-                            children: [
-                              Text(
-                                '\$${originalPrice.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
+                          children: [
+                            Text(
+                              '\$${originalPrice.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                decoration: TextDecoration.lineThrough,
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '\$${discountedPrice.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            '\$${originalPrice.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
                             ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '\$${discountedPrice.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        )
+                        : Text(
+                          '\$${originalPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
+                        ),
                   ],
                 ),
               ),

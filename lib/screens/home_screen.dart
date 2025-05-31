@@ -143,83 +143,113 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Barra de búsqueda
-              SearchBarWidget(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: Colors.white,
+            elevation: 2,
+            automaticallyImplyLeading: false,
+            titleSpacing: 0,
+            toolbarHeight: 70,
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SearchBarWidget(
                 onSearch: (query) {
                   context.read<ProductProvider>().filterProducts(query);
                 },
               ),
-              // Historial de búsqueda
-              SearchHistoryList(
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SearchHistoryList(
                 onTapHistory: (term) {
                   context.read<SearchProvider>().updateQuery(term);
                   context.read<ProductProvider>().filterProducts(term);
                 },
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Categories',
-                style: TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              categoryProvider.isLoading
-                  ? const CategoryMenuShimmer()
-                  : const CategoryMenu(),
-              const SizedBox(height: 12),
-              const FilterChipsBar(), // Aquí se inserta la barra de filtros horizontal
-              const SizedBox(height: 20),
-              const Text(
-                'Most Popular',
-                style: TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 160,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: popularProducts.length,
-                  itemBuilder:
-                      (context, index) =>
-                          PopularProductCard(product: popularProducts[index]),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                'Just For You',
-                style: TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
-                child:
-                    productProvider.isLoading
-                        ? _buildGridShimmer()
-                        : _buildGridView(filteredProducts),
-              ),
-            ],
+            ),
           ),
-        ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Categories',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  categoryProvider.isLoading
+                      ? const CategoryMenuShimmer()
+                      : const CategoryMenu(),
+                  const SizedBox(height: 12),
+                  const FilterChipsBar(),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Most Popular',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 160,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: popularProducts.length,
+                      itemBuilder:
+                          (context, index) => PopularProductCard(
+                            product: popularProducts[index],
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'Just For You',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
+          productProvider.isLoading
+              ? SliverToBoxAdapter(child: _buildGridShimmer())
+              : SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) =>
+                        ProductGridItem(product: filteredProducts[index]),
+                    childCount: filteredProducts.length,
+                  ),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 3 / 4,
+                  ),
+                ),
+              ),
+        ],
       ),
     );
   }

@@ -11,6 +11,7 @@ import '../widgets/size_selector.dart';
 import '../utils/notification_helper.dart';
 import '../widgets/review_section.dart';
 import '../widgets/faq_section.dart';
+import '../screens/image_zoom_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -56,15 +57,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Hero(
-              tag: 'product-image-detail-${product.id}',
-              child: Image.network(
-                product.imageUrl,
-                width: double.infinity,
-                height: 280,
-                fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ImageZoomScreen(imageUrl: product.imageUrl),
+                  ),
+                );
+              },
+              child: Hero(
+                tag: 'product-image-detail-${product.id}',
+                child: Image.network(
+                  product.imageUrl,
+                  width: double.infinity,
+                  height: 280,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
+
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -82,7 +94,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '\$${(product.price * 0.75).toStringAsFixed(2)}', 
+                            '\$${(product.price * 0.75).toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -400,7 +412,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
             ),
-            
           ],
         ),
       ),
