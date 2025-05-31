@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../screens/product_detail_screen.dart';
 import '../providers/product_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/view_mode_provider.dart';
@@ -8,6 +9,7 @@ import '../widgets/product_list_item.dart';
 import '../widgets/category_menu.dart';
 import '../widgets_shimmer/product_grid_item_shimmer.dart';
 import '../widgets_shimmer/product_list_item_shimmer.dart';
+import '../widgets/product_discount_card.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -150,7 +152,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         return Container(
                           width: 120,
                           margin: const EdgeInsets.only(right: 12),
-                          child: ProductGridItem(product: product),
+                          child: ProductDiscountCard(
+                            product: product,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          ProductDetailScreen(product: product),
+                                ),
+                              );
+                            },
+                          ),
                         );
                       },
                     ),
@@ -178,7 +192,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         return Container(
                           width: 120,
                           margin: const EdgeInsets.only(right: 12),
-                          child: ProductGridItem(product: product),
+                          child: ProductDiscountCard(
+                            product: product,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          ProductDetailScreen(product: product),
+                                ),
+                              );
+                            },
+                          ),
                         );
                       },
                     ),

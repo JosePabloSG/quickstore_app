@@ -10,6 +10,16 @@ class ProductGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cacheSize = screenWidth <= 360 ? 180 : screenWidth <= 600 ? 280 : 350;
+
+    final bool hasDiscount = product.hasPriceChanged;
+    final double originalPrice = product.price;
+    final double discountedPrice = hasDiscount ? originalPrice * 0.75 : originalPrice;
+    final int discountPercent = hasDiscount
+        ? ((1 - (discountedPrice / originalPrice)) * 100).round()
+        : 0;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -35,37 +45,59 @@ class ProductGridItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagen del producto con animación
-            Hero(
-              tag: 'product-image-detail-${product.id}',
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: product.imageUrl,
-                  height:
-                      120, // Reduje ligeramente la altura para prevenir overflow
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  memCacheHeight: 280,
-                  memCacheWidth: 280,
-                  placeholder:
+            Stack(
+              children: [
+                Hero(
+                  tag: 'product-image-detail-${product.id}',
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: product.imageUrl,
+                      height: 
+                       120, // Reduje ligeramente la altura para prevenir overflow
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      memCacheHeight: cacheSize,
+                      memCacheWidth: cacheSize,
+                      placeholder: 
                       (context, url) => Container(
                         color: Colors.grey.shade200,
                         child: const Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       ),
-                  errorWidget:
-                      (context, url, error) => Container(
+                      errorWidget:
+                       (context, url, error) => Container(
                         color: Colors.grey.shade300,
                         child: const Icon(Icons.broken_image),
                       ),
+                    ),
+                  ),
                 ),
-              ),
+                if (hasDiscount)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '-$discountPercent%',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            // Uso de Expanded para distribuir correctamente el espacio
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -85,14 +117,36 @@ class ProductGridItem extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '\$${product.price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
+                    hasDiscount
+                        ? Row(
+                            children: [
+                              Text(
+                                '\$${originalPrice.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '\$${discountedPrice.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            '\$${originalPrice.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
                   ],
                 ),
               ),
