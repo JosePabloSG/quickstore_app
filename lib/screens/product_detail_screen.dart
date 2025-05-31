@@ -10,9 +10,9 @@ import '../widgets/color_selector.dart';
 import '../widgets/size_selector.dart';
 import '../utils/notification_helper.dart';
 import '../widgets/review_section.dart';
+import '../widgets/faq_section.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-
   final Product product;
   const ProductDetailScreen({super.key, required this.product});
 
@@ -73,7 +73,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ? Row(
                         children: [
                           Text(
-                            '\$${(product.price * 1.25).toStringAsFixed(2)}',
+                            '\$${product.price.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.grey,
@@ -82,7 +82,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '\$${product.price.toStringAsFixed(2)}',
+                            '\$${(product.price * 0.75).toStringAsFixed(2)}', 
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -235,6 +235,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             // Sección de Reseñas Detalladas
             ReviewSection(productId: product.id),
+            // FAQ Section
+            const FaqSection(),
             // Buttons
             Padding(
               padding: const EdgeInsets.all(16.0),

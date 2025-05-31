@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
 
-class PopularProductCard extends StatelessWidget {
+class ProductDiscountCard extends StatelessWidget {
   final Product product;
+  final VoidCallback onTap;
 
-  const PopularProductCard({super.key, required this.product});
+  const ProductDiscountCard({
+    Key? key,
+    required this.product,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,14 +22,7 @@ class PopularProductCard extends StatelessWidget {
         : 0;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: product),
-          ),
-        );
-      },
+      onTap: onTap,
       child: Container(
         width: 110,
         margin: const EdgeInsets.only(right: 12),
@@ -44,18 +42,13 @@ class PopularProductCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Hero(
-                  tag: 'product-image-${product.id}',
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                    child: Image.network(
-                      product.imageUrl,
-                      height: 100,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: Image.network(
+                    product.imageUrl,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 if (hasDiscount)
@@ -82,42 +75,36 @@ class PopularProductCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 6),
-                  hasDiscount
-                      ? Row(
-                          children: [
-                            Text(
-                              '\$${originalPrice.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey,
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '\$${discountedPrice.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        )
-                      : Text(
+              child: hasDiscount
+                  ? Row(
+                      children: [
+                        Text(
                           '\$${originalPrice.toStringAsFixed(2)}',
                           style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '\$${discountedPrice.toStringAsFixed(2)}',
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.black,
                           ),
                         ),
-                ],
-              ),
+                      ],
+                    )
+                  : Text(
+                      '\$${originalPrice.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
             ),
           ],
         ),
