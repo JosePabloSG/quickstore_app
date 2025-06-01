@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/product_provider.dart';
-import 'package:quickstore_app/screens/payment_methods_screen.dart';
+import 'package:quickstore_app/screens/payments_screen.dart';
 import 'package:quickstore_app/widgets/popular_product.dart';
 import 'package:quickstore_app/widgets/cart_item_tile.dart';
 import 'package:quickstore_app/widgets/price_row.dart';

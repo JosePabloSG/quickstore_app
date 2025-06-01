@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quickstore_app/providers/buyNow_provider.dart';
 import 'package:quickstore_app/providers/favorites_provider.dart';
-import 'package:quickstore_app/screens/payment_methods_screen.dart';
+import 'package:quickstore_app/screens/payments_screen.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';

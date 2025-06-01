@@ -23,5 +23,7 @@ class BuyNowProvider with ChangeNotifier {
     _isBuyNow = false;
     notifyListeners();
   }
+  double get total => product != null ? product!.price * quantity : 0.0;
+
 }
 
