@@ -3,8 +3,9 @@ class PaymentMethod {
   final String cardHolder;
   final String cardNumber;
   final String expiryDate;
-  final String cardType; // 'visa', 'mastercard', etc.
-  final String? cvv;
+  final String cardType;
+  final String email;
+  final int cvv;
 
   PaymentMethod({
     required this.id,
@@ -12,10 +13,10 @@ class PaymentMethod {
     required this.cardNumber,
     required this.expiryDate,
     required this.cardType,
-    this.cvv,
+    required this.email,
+    required this.cvv,
   });
 
-  // Para mostrar solo los últimos 4 dígitos de la tarjeta
   String get maskedCardNumber {
     if (cardNumber.length < 4) return cardNumber;
     return '•••• •••• •••• ${cardNumber.substring(cardNumber.length - 4)}';
@@ -27,18 +28,19 @@ class PaymentMethod {
       cardHolder: json['cardHolder'] ?? '',
       cardNumber: json['cardNumber'] ?? '',
       expiryDate: json['expiryDate'] ?? '',
-      cardType: json['cardType'] ?? 'visa',
-      cvv: json['cvv'],
+      cardType: json['cardType'] ?? '',
+      email: json['email'] ?? '',
+      cvv: json['cvv'] is int ? json['cvv'] : int.tryParse(json['cvv'].toString()) ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'cardHolder': cardHolder,
       'cardNumber': cardNumber,
       'expiryDate': expiryDate,
       'cardType': cardType,
+      'email': email,
       'cvv': cvv,
     };
   }

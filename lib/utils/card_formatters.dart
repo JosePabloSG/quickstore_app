@@ -37,25 +37,25 @@ class ExpiryDateFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    var text = newValue.text;
+    // Solo permitir números
+    String numbersOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-    if (newValue.selection.baseOffset == 0) {
-      return newValue;
+    // Limitar a máximo 4 dígitos (MMYY)
+    if (numbersOnly.length > 4) {
+      numbersOnly = numbersOnly.substring(0, 4);
     }
 
-    var buffer = StringBuffer();
-    for (int i = 0; i < text.length; i++) {
-      buffer.write(text[i]);
-      var nonZeroIndex = i + 1;
-      if (nonZeroIndex % 2 == 0 && nonZeroIndex != text.length) {
-        buffer.write('/');
-      }
+    // Insertar el "/"
+    String formatted = '';
+    for (int i = 0; i < numbersOnly.length; i++) {
+      if (i == 2) formatted += '/';
+      formatted += numbersOnly[i];
     }
 
-    var string = buffer.toString();
-    return newValue.copyWith(
-      text: string,
-      selection: TextSelection.collapsed(offset: string.length),
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
+
