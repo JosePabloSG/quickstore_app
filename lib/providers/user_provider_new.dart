@@ -63,6 +63,7 @@ class UserProvider with ChangeNotifier {
           phoneNumber: phoneNumber,
           photoUrl: photoUrl,
         );
+
         await _userService.updateUser(updatedUser);
         _user = updatedUser;
       }
@@ -223,21 +224,13 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updatePreferences({
-    String? language,
-    String? currency,
-    bool? isDarkMode,
-  }) async {
+  Future<void> toggleDarkMode() async {
     try {
       _isLoading = true;
       notifyListeners();
 
       if (_user != null) {
-        final updatedUser = _user!.copyWith(
-          preferredLanguage: language,
-          preferredCurrency: currency,
-          isDarkMode: isDarkMode,
-        );
+        final updatedUser = _user!.copyWith(isDarkMode: !_user!.isDarkMode);
         await _userService.updateUser(updatedUser);
         _user = updatedUser;
       }
@@ -245,5 +238,11 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void clearUser() {
+    _user = null;
+    _addresses = [];
+    notifyListeners();
   }
 }

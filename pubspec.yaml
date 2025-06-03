@@ -42,6 +42,8 @@ dependencies:
   cached_network_image: ^3.3.1
   lucide_icons: ^0.257.0
   cloud_firestore: ^5.6.8
+  country_picker: ^2.0.27
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
