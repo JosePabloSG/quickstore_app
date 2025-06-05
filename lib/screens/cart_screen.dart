@@ -18,7 +18,9 @@ class CartScreen extends StatelessWidget {
     final cart = context.watch<CartProvider>();
     final items = cart.items.values.toList();
     final productProvider = context.watch<ProductProvider>();
-    final popularProducts = productProvider.products.take(5).toList();
+    final popularProducts = productProvider.popularProducts;
+
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -50,6 +52,7 @@ class CartScreen extends StatelessWidget {
           ],
         ),
       ),
+      
       body: items.isEmpty
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -65,8 +68,7 @@ class CartScreen extends StatelessWidget {
                           width: 180,
                           height: 180,
                         ),
-                        const SizedBox(height: 20),
-                        const Text('Tu carrito está vacío'),
+                        const SizedBox(height: 28),
                       ],
                     ),
                   ),

@@ -85,7 +85,7 @@ class PopularProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                // ✅ Botón nuevo
+                // Botón nuevo
                 Positioned(
                   bottom: 6,
                   right: 6,
