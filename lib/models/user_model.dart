@@ -1,171 +1,135 @@
+import 'package:quickstore_app/models/address_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String id;
-  final String? name;
+  final String name;
   final String email;
-  final String? phoneNumber;
   final String? photoUrl;
-  final List<Address> addresses;
-  final String? preferredLanguage;
-  final String? preferredCurrency;
+  final String? phoneNumber;
+  final bool isDarkMode;
+  final String preferredLanguage;
+  final String preferredCurrency;
   final NotificationPreferences notificationPreferences;
   final DateTime createdAt;
-  final bool isDarkMode;
+  final List<Address> addresses;
 
   UserModel({
     required this.id,
-    this.name,
+    required this.name,
     required this.email,
-    this.phoneNumber,
     this.photoUrl,
-    this.addresses = const [],
+    this.phoneNumber,
+    this.isDarkMode = false,
     this.preferredLanguage = 'en',
     this.preferredCurrency = 'USD',
     NotificationPreferences? notificationPreferences,
     required this.createdAt,
-    this.isDarkMode = false,
-  }) : notificationPreferences =
-           notificationPreferences ?? NotificationPreferences();
+    this.addresses = const [],
+  }) : notificationPreferences = notificationPreferences ?? NotificationPreferences();
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
       'email': email,
-      'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
-      'addresses': addresses.map((address) => address.toMap()).toList(),
+      'phoneNumber': phoneNumber,
+      'isDarkMode': isDarkMode,
       'preferredLanguage': preferredLanguage,
       'preferredCurrency': preferredCurrency,
-      'notificationPreferences': notificationPreferences.toMap(),
-      'createdAt': createdAt.toIso8601String(),
-      'isDarkMode': isDarkMode,
+      'notificationPreferences': notificationPreferences.toJson(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'addresses': addresses.map((address) => address.toMap()).toList(),
     };
   }
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      phoneNumber: map['phoneNumber'],
-      photoUrl: map['photoUrl'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      photoUrl: json['photoUrl'],
+      phoneNumber: json['phoneNumber'],
+      isDarkMode: json['isDarkMode'] ?? false,
+      preferredLanguage: json['preferredLanguage'] ?? 'en',
+      preferredCurrency: json['preferredCurrency'] ?? 'USD',
+      notificationPreferences: json['notificationPreferences'] != null
+          ? NotificationPreferences.fromJson(json['notificationPreferences'])
+          : null,
+      createdAt: (json['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       addresses: List<Address>.from(
-        (map['addresses'] ?? []).map((x) => Address.fromMap(x)),
+        (json['addresses'] ?? []).map((x) => Address.fromMap(x)),
       ),
-      preferredLanguage: map['preferredLanguage'] ?? 'en',
-      preferredCurrency: map['preferredCurrency'] ?? 'USD',
-      notificationPreferences: NotificationPreferences.fromMap(
-        map['notificationPreferences'] ?? {},
-      ),
-      createdAt: DateTime.parse(map['createdAt']),
-      isDarkMode: map['isDarkMode'] ?? false,
     );
   }
 
   UserModel copyWith({
+    String? id,
     String? name,
     String? email,
-    String? phoneNumber,
     String? photoUrl,
-    List<Address>? addresses,
+    String? phoneNumber,
+    bool? isDarkMode,
     String? preferredLanguage,
     String? preferredCurrency,
     NotificationPreferences? notificationPreferences,
-    bool? isDarkMode,
+    DateTime? createdAt,
+    List<Address>? addresses,
   }) {
     return UserModel(
-      id: id,
+      id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
-      addresses: addresses ?? this.addresses,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       preferredCurrency: preferredCurrency ?? this.preferredCurrency,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
-      createdAt: createdAt,
-      isDarkMode: isDarkMode ?? this.isDarkMode,
-    );
-  }
-}
-
-class Address {
-  final String id;
-  final String street;
-  final String city;
-  final String state;
-  final String zipCode;
-  final String country;
-  final bool isDefault;
-  final String? label;
-
-  Address({
-    required this.id,
-    required this.street,
-    required this.city,
-    required this.state,
-    required this.zipCode,
-    required this.country,
-    this.isDefault = false,
-    this.label,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'street': street,
-      'city': city,
-      'state': state,
-      'zipCode': zipCode,
-      'country': country,
-      'isDefault': isDefault,
-      'label': label,
-    };
-  }
-
-  factory Address.fromMap(Map<String, dynamic> map) {
-    return Address(
-      id: map['id'],
-      street: map['street'],
-      city: map['city'],
-      state: map['state'],
-      zipCode: map['zipCode'],
-      country: map['country'],
-      isDefault: map['isDefault'] ?? false,
-      label: map['label'],
+      createdAt: createdAt ?? this.createdAt,
+      addresses: addresses ?? this.addresses,
     );
   }
 }
 
 class NotificationPreferences {
-  final bool orderUpdates;
-  final bool promotions;
-  final bool newProducts;
-  final bool priceAlerts;
+  final bool offers;
+  final bool orders;
+  final bool marketing;
 
   NotificationPreferences({
-    this.orderUpdates = true,
-    this.promotions = true,
-    this.newProducts = true,
-    this.priceAlerts = true,
+    this.offers = false,
+    this.orders = false,
+    this.marketing = false,
   });
 
-  Map<String, dynamic> toMap() {
+  NotificationPreferences copyWith({
+    bool? offers,
+    bool? orders,
+    bool? marketing,
+  }) {
+    return NotificationPreferences(
+      offers: offers ?? this.offers,
+      orders: orders ?? this.orders,
+      marketing: marketing ?? this.marketing,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
     return {
-      'orderUpdates': orderUpdates,
-      'promotions': promotions,
-      'newProducts': newProducts,
-      'priceAlerts': priceAlerts,
+      'offers': offers,
+      'orders': orders,
+      'marketing': marketing,
     };
   }
 
-  factory NotificationPreferences.fromMap(Map<String, dynamic> map) {
+  factory NotificationPreferences.fromJson(Map<String, dynamic> json) {
     return NotificationPreferences(
-      orderUpdates: map['orderUpdates'] ?? true,
-      promotions: map['promotions'] ?? true,
-      newProducts: map['newProducts'] ?? true,
-      priceAlerts: map['priceAlerts'] ?? true,
+      offers: json['offers'] ?? false,
+      orders: json['orders'] ?? false,
+      marketing: json['marketing'] ?? false,
     );
   }
 }

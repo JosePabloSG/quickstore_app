@@ -4,83 +4,36 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quickstore_app/utils/card_formatters.dart';
 import '../models/payment_method.dart';
 import '../services/card_service.dart';
+import '../services/payment_method_service.dart';
 
-class AddPaymentMethodScreen extends StatefulWidget {
-  final PaymentMethod? existingCard;
+class PaymentMethodsScreenNew extends StatefulWidget {
+  final PaymentMethod? paymentMethod;
 
-  const AddPaymentMethodScreen({super.key, this.existingCard});
+  const PaymentMethodsScreenNew({Key? key, this.paymentMethod}) : super(key: key);
 
   @override
-  State<AddPaymentMethodScreen> createState() => _AddPaymentMethodScreenState();
+  _PaymentMethodsScreenNewState createState() => _PaymentMethodsScreenNewState();
 }
 
-class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
+class _PaymentMethodsScreenNewState extends State<PaymentMethodsScreenNew> {
   final _formKey = GlobalKey<FormState>();
   final _cardHolderController = TextEditingController();
   final _cardNumberController = TextEditingController();
   final _expiryDateController = TextEditingController();
   final _cvvController = TextEditingController();
-  String _cardType = 'visa'; // Default value
-
-  final _cardService = CardService();
+  final _paymentMethodService = PaymentMethodService();
+  bool _isDefault = false;
 
   @override
   void initState() {
     super.initState();
-    final card = widget.existingCard;
-    if (card != null) {
-      _cardHolderController.text = card.cardHolder;
+    if (widget.paymentMethod != null) {
+      final card = widget.paymentMethod!;
+      _cardHolderController.text = card.cardHolderName;
       _cardNumberController.text = card.cardNumber;
       _expiryDateController.text = card.expiryDate;
-      _cvvController.text = card.cvv.toString();
-      _cardType = card.cardType;
-    }
-  }
-
-  Future<void> _saveCard() async {
-    if (_formKey.currentState!.validate()) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return;
-
-      final userEmail = user.email ?? '';
-      final cleanCardNumber = _cardNumberController.text.replaceAll(' ', '');
-
-      final newCard = PaymentMethod(
-        id: widget.existingCard?.id ?? '',
-        cardHolder: _cardHolderController.text.trim(),
-        cardNumber: cleanCardNumber,
-        expiryDate: _expiryDateController.text.trim(),
-        cardType: _cardType,
-        email: userEmail,
-        cvv: int.tryParse(_cvvController.text.trim()) ?? 0,
-      );
-
-      // Validar duplicados solo si se está añadiendo, no editando
-      if (widget.existingCard == null) {
-        final existingCards = await _cardService.getPaymentMethods();
-        final isDuplicate = existingCards.any((card) =>
-            card.cardNumber.replaceAll(' ', '') == cleanCardNumber &&
-            card.email == userEmail);
-
-        if (isDuplicate) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Esta tarjeta ya está registrada.')),
-          );
-          return;
-        }
-      }
-
-      final result = widget.existingCard != null
-          ? await _cardService.updatePaymentMethod(newCard)
-          : await _cardService.addPaymentMethod(newCard);
-
-      if (result != null && context.mounted) {
-        Navigator.pop(context, result);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error saving card')),
-        );
-      }
+      _cvvController.text = card.cvv;
+      _isDefault = card.isDefault;
     }
   }
 
@@ -93,102 +46,132 @@ class _AddPaymentMethodScreenState extends State<AddPaymentMethodScreen> {
     super.dispose();
   }
 
+  Future<void> _savePaymentMethod() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      final paymentMethod = PaymentMethod(
+        id: widget.paymentMethod?.id ?? '',
+        cardHolderName: _cardHolderController.text.trim(),
+        cardNumber: _cardNumberController.text.trim(),
+        expiryDate: _expiryDateController.text.trim(),
+        cvv: _cvvController.text.trim(),
+        email: '', // Se asignará en el servicio
+        isDefault: _isDefault,
+      );
+
+      if (widget.paymentMethod == null) {
+        await _paymentMethodService.createPaymentMethod(paymentMethod);
+      } else {
+        await _paymentMethodService.updatePaymentMethod(paymentMethod);
+      }
+
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = (String label) => InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        );
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Card'), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
+      appBar: AppBar(
+        title: Text(widget.paymentMethod == null
+            ? 'Agregar método de pago'
+            : 'Editar método de pago'),
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            TextFormField(
+              controller: _cardHolderController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre del titular',
+                hintText: 'Como aparece en la tarjeta',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese el nombre del titular';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _cardNumberController,
+              decoration: const InputDecoration(
+                labelText: 'Número de tarjeta',
+                hintText: 'XXXX XXXX XXXX XXXX',
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor ingrese el número de tarjeta';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                TextFormField(
-                  controller: _cardHolderController,
-                  decoration: inputDecoration('Card Holder'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Required' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _cardNumberController,
-                  keyboardType: TextInputType.number,
-                  decoration: inputDecoration('Card Number'),
-                  validator: (value) =>
-                      value == null || value.length < 16
-                          ? 'Invalid card number'
-                          : null,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _cardType,
-                  decoration: inputDecoration('Card Type'),
-                  items: ['visa', 'mastercard']
-                      .map((type) => DropdownMenuItem(
-                            value: type,
-                            child: Text(type.toUpperCase()),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _cardType = value);
-                  },
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _expiryDateController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Expiry Date',
-                          hintText: 'MM/YY',
-                        ),
-                        inputFormatters: [ExpiryDateFormatter()],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) return 'Required';
-                          if (!RegExp(r'^\d{2}/\d{2}$').hasMatch(value)) {
-                            return 'Use MM/YY format';
-                          }
-                          return null;
-                        },
-                      ),
+                Expanded(
+                  child: TextFormField(
+                    controller: _expiryDateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Fecha de expiración',
+                      hintText: 'MM/YY',
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextFormField(
-                        controller: _cvvController,
-                        keyboardType: TextInputType.number,
-                        decoration: inputDecoration('CVV'),
-                        validator: (value) =>
-                            value == null || value.length != 3
-                                ? 'Invalid CVV'
-                                : null,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _saveCard,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: Colors.blue,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingrese la fecha';
+                      }
+                      return null;
+                    },
                   ),
-                  child: const Text(
-                    'Save Changes',
-                    style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _cvvController,
+                    decoration: const InputDecoration(
+                      labelText: 'CVV',
+                      hintText: '123',
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingrese el CVV';
+                      }
+                      return null;
+                    },
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Establecer como predeterminado'),
+              value: _isDefault,
+              onChanged: (bool value) {
+                setState(() {
+                  _isDefault = value;
+                });
+              },
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _savePaymentMethod,
+              child: Text(widget.paymentMethod == null ? 'Agregar' : 'Guardar'),
+            ),
+          ],
         ),
       ),
     );

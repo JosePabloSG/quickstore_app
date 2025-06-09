@@ -37,7 +37,19 @@ class LanguageCurrencyScreen extends StatelessWidget {
             value: 'en',
             groupValue: user?.preferredLanguage,
             onChanged: (value) {
-              userProvider.updatePreferences(language: value);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Próximamente'),
+                  content: const Text('La selección de idioma estará disponible en la próxima actualización.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Entendido'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           RadioListTile(
@@ -45,7 +57,19 @@ class LanguageCurrencyScreen extends StatelessWidget {
             value: 'es',
             groupValue: user?.preferredLanguage,
             onChanged: (value) {
-              userProvider.updatePreferences(language: value);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Próximamente'),
+                  content: const Text('La selección de idioma estará disponible en la próxima actualización.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Entendido'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           const Divider(),
@@ -63,19 +87,43 @@ class LanguageCurrencyScreen extends StatelessWidget {
             ),
           ),
           RadioListTile(
-            title: const Text('US Dollar (USD)'),
+            title: const Text('USD (\$)'),
             value: 'USD',
             groupValue: user?.preferredCurrency,
             onChanged: (value) {
-              userProvider.updatePreferences(currency: value);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Próximamente'),
+                  content: const Text('La selección de moneda estará disponible en la próxima actualización.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Entendido'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           RadioListTile(
-            title: const Text('Euro (EUR)'),
+            title: const Text('EUR (€)'),
             value: 'EUR',
             groupValue: user?.preferredCurrency,
             onChanged: (value) {
-              userProvider.updatePreferences(currency: value);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Próximamente'),
+                  content: const Text('La selección de moneda estará disponible en la próxima actualización.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Entendido'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           RadioListTile(

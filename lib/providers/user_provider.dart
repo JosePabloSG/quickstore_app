@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
+import '../models/address_model.dart';
 import '../services/user_service.dart';
 import '../services/shipping_address_service.dart';
 
@@ -22,7 +23,7 @@ class UserProvider with ChangeNotifier {
 
       final firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser != null) {
-        _user = await _userService.getUserById(firebaseUser.uid);
+        _user = await _userService.getUser(firebaseUser.uid);
         await loadAddresses();
       }
     } finally {
@@ -77,18 +78,7 @@ class UserProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      // Actualizar en el API
-      final updatedAddress = await _addressService.updateAddress(address);
-
-      // Actualizar en la lista local
-      final addressIndex = _addresses.indexWhere((a) => a.id == address.id);
-      if (addressIndex != -1) {
-        _addresses[addressIndex] = updatedAddress;
-      } else {
-        _addresses.add(updatedAddress);
-      }
-
-      // Si es dirección por defecto, actualizar las demás direcciones
+      // Si es dirección por defecto, actualizar las demás direcciones primero
       if (address.isDefault) {
         for (var i = 0; i < _addresses.length; i++) {
           if (_addresses[i].id != address.id && _addresses[i].isDefault) {
@@ -101,12 +91,24 @@ class UserProvider with ChangeNotifier {
               country: _addresses[i].country,
               label: _addresses[i].label,
               isDefault: false,
+              email: _addresses[i].email,
             );
 
             await _addressService.updateAddress(nonDefaultAddress);
             _addresses[i] = nonDefaultAddress;
           }
         }
+      }
+
+      // Actualizar en el API
+      final updatedAddress = await _addressService.updateAddress(address);
+
+      // Actualizar en la lista local
+      final addressIndex = _addresses.indexWhere((a) => a.id == address.id);
+      if (addressIndex != -1) {
+        _addresses[addressIndex] = updatedAddress;
+      } else {
+        _addresses.add(updatedAddress);
       }
 
       // También actualizar en el usuario de Firebase si está disponible
@@ -137,17 +139,10 @@ class UserProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      // Crear en el API
-      final createdAddress = await _addressService.createAddress(address);
-
-      // Añadir a la lista local
-      _addresses.add(createdAddress);
-
-      // Si es dirección por defecto, actualizar las demás direcciones
+      // Si es dirección por defecto, actualizar las demás direcciones primero
       if (address.isDefault) {
         for (var i = 0; i < _addresses.length; i++) {
-          if (_addresses[i].id != createdAddress.id &&
-              _addresses[i].isDefault) {
+          if (_addresses[i].isDefault) {
             final nonDefaultAddress = Address(
               id: _addresses[i].id,
               street: _addresses[i].street,
@@ -157,6 +152,7 @@ class UserProvider with ChangeNotifier {
               country: _addresses[i].country,
               label: _addresses[i].label,
               isDefault: false,
+              email: _addresses[i].email,
             );
 
             await _addressService.updateAddress(nonDefaultAddress);
@@ -164,6 +160,12 @@ class UserProvider with ChangeNotifier {
           }
         }
       }
+
+      // Crear en el API
+      final createdAddress = await _addressService.createAddress(address);
+
+      // Añadir a la lista local
+      _addresses.add(createdAddress);
 
       // También actualizar en el usuario de Firebase si está disponible
       if (_user != null) {
@@ -193,8 +195,7 @@ class UserProvider with ChangeNotifier {
 
       // También eliminar del usuario de Firebase si está disponible
       if (_user != null) {
-        final userAddresses =
-            _user!.addresses.where((a) => a.id != addressId).toList();
+        final userAddresses = _user!.addresses.where((a) => a.id != addressId).toList();
         final updatedUser = _user!.copyWith(addresses: userAddresses);
         await _userService.updateUser(updatedUser);
         _user = updatedUser;

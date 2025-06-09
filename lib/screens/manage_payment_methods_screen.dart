@@ -116,7 +116,7 @@ class _ManagePaymentMethodsScreenState
 
   Future<void> _openAddCardScreen() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen()),
+      MaterialPageRoute(builder: (_) => const PaymentMethodsScreenNew()),
     );
 
     if (result != null) {
@@ -127,7 +127,7 @@ class _ManagePaymentMethodsScreenState
   Future<void> _openEditCardScreen(PaymentMethod card) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-          builder: (_) => EditPaymentMethodScreen(card: card),
+          builder: (_) => EditPaymentMethodScreen(paymentMethod: card),
     ));
     
     if (result != null) {
@@ -236,21 +236,21 @@ class _ManagePaymentMethodsScreenState
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset(
-                card.cardType.toLowerCase() == 'mastercard'
-                    ? 'assets/Images/Mastercard.svg'
-                    : 'assets/Images/Visa.svg',
-                width: 50,
-                height: 50,
+              Image.asset(
+                'assets/images/card_${card.cardNumber.startsWith('5') ? 'mastercard' : 'visa'}.png',
+                height: 24,
               ),
-              const Spacer(),
-              Text(card.maskedCardNumber,
-                  style: const TextStyle(letterSpacing: 2)),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(card.cardHolderName),
+                  Text(card.maskedCardNumber),
+                ],
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(card.cardHolder),
-                  const Spacer(),
                   Text(card.expiryDate),
                 ],
               ),

@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quickstore_app/screens/login_email_screen.dart';
-import 'package:quickstore_app/services/auth_service.dart';
-import 'package:quickstore_app/widgets/popular_product.dart';
 import '../providers/product_provider.dart';
 import '../providers/category_provider.dart';
+import '../providers/search_provider.dart';
+import '../widgets/search_bar.dart';
+import '../widgets/search_history_list.dart';
 import '../widgets/category_menu.dart';
-import '../widgets/product_grid_item.dart';
+import '../widgets/popular_product.dart';
 import '../widgets_shimmer/category_menu_shimmer.dart';
 import '../widgets_shimmer/product_grid_item_shimmer.dart';
-import '../widgets/search_bar.dart';
-import '../providers/search_provider.dart';
-import '../widgets/search_history_list.dart';
+import '../widgets/product_grid_item.dart';
 import '../widgets/filter_chips_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -35,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
     final productProvider = context.watch<ProductProvider>();
     final categoryProvider = context.watch<CategoryProvider>();
     final products = productProvider.products;
@@ -48,100 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Padding(padding: EdgeInsets.only(left: 12)),
         backgroundColor: Colors.white,
         elevation: 2,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    child: Icon(Icons.person, size: 30),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    user?.email ?? '',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              enabled: !_isLoading,
-              leading:
-                  _isLoading
-                      ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                      : const Icon(Icons.logout),
-              title: Text(_isLoading ? 'Cerrando sesión...' : 'Cerrar sesión'),
-              onTap: () async {
-                final shouldLogout = await showDialog<bool>(
-                  context: context,
-                  builder:
-                      (context) => AlertDialog(
-                        title: const Text('Confirmar cierre de sesión'),
-                        content: const Text(
-                          '¿Estás seguro de que deseas cerrar sesión?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('Cancelar'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('Cerrar sesión'),
-                          ),
-                        ],
-                      ),
-                );
-
-                if (shouldLogout == true) {
-                  try {
-                    setState(() => _isLoading = true);
-
-                    // First disable any UI interactions
-                    await Future.microtask(() {});
-
-                    // Then sign out
-                    await AuthService().signOut();
-
-                    if (!context.mounted) return;
-
-                    // Finally navigate and reset stack
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (_) => const LoginEmailScreen(),
-                      ),
-                      (route) => false,
-                    );
-                  } catch (e) {
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Error al cerrar sesión. Intenta de nuevo.',
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  } finally {
-                    if (mounted) {
-                      setState(() => _isLoading = false);
-                    }
-                  }
-                }
-              },
-            ),
-          ],
-        ),
       ),
       body: CustomScrollView(
         slivers: [
