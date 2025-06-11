@@ -97,8 +97,8 @@ class Address {
   final String state;
   final String zipCode;
   final String country;
-  final bool isDefault;
   final String? label;
+  final String email;
 
   Address({
     required this.id,
@@ -107,7 +107,7 @@ class Address {
     required this.state,
     required this.zipCode,
     required this.country,
-    this.isDefault = false,
+    required this.email,
     this.label,
   });
 
@@ -119,8 +119,8 @@ class Address {
       'state': state,
       'zipCode': zipCode,
       'country': country,
-      'isDefault': isDefault,
       'label': label,
+      'email': email,
     };
   }
 
@@ -132,8 +132,8 @@ class Address {
       state: map['state'],
       zipCode: map['zipCode'],
       country: map['country'],
-      isDefault: map['isDefault'] ?? false,
       label: map['label'],
+      email: map['email'] ?? '',
     );
   }
 }

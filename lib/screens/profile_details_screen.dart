@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'update_email_screen.dart';
 import 'change_password_screen.dart';
 
 class ProfileDetailsScreen extends StatelessWidget {
@@ -43,19 +42,6 @@ class ProfileDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              ListTile(
-                leading: const Icon(Icons.email),
-                title: const Text('Update Email'),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const UpdateEmailScreen(),
-                    ),
-                  );
-                },
-              ),
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.lock),

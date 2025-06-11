@@ -6,14 +6,19 @@ class ShippingAddressService {
   static const String baseUrl =
       'https://682f4084f504aa3c70f35128.mockapi.io/shipping-address';
 
-  // Obtener todas las direcciones
-  Future<List<Address>> getAddresses() async {
+  // Obtener las direcciones de un usuario
+  Future<List<Address>> getAddresses({required String userEmail}) async {
     try {
-      final response = await http.get(Uri.parse(baseUrl));
+      // Agregamos el email como parámetro de consulta
+      final uri = Uri.parse(
+        baseUrl,
+      ).replace(queryParameters: {'email': userEmail});
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data
+            .where((json) => json['email'] == userEmail) // Filtramos por email
             .map(
               (json) => Address(
                 id: json['id'],
@@ -22,8 +27,8 @@ class ShippingAddressService {
                 state: json['state'],
                 zipCode: json['zipCode'],
                 country: json['country'],
-                isDefault: json['isDefault'] ?? false,
                 label: json['label'],
+                email: json['email'],
               ),
             )
             .toList();
@@ -47,8 +52,8 @@ class ShippingAddressService {
           'state': address.state,
           'zipCode': address.zipCode,
           'country': address.country,
-          'isDefault': address.isDefault,
           'label': address.label,
+          'email': address.email,
         }),
       );
 
@@ -61,8 +66,8 @@ class ShippingAddressService {
           state: data['state'],
           zipCode: data['zipCode'],
           country: data['country'],
-          isDefault: data['isDefault'] ?? false,
           label: data['label'],
+          email: address.email,
         );
       } else {
         throw Exception('Failed to create address: ${response.statusCode}');
@@ -84,7 +89,6 @@ class ShippingAddressService {
           'state': address.state,
           'zipCode': address.zipCode,
           'country': address.country,
-          'isDefault': address.isDefault,
           'label': address.label,
         }),
       );
@@ -98,8 +102,8 @@ class ShippingAddressService {
           state: data['state'],
           zipCode: data['zipCode'],
           country: data['country'],
-          isDefault: data['isDefault'] ?? false,
           label: data['label'],
+          email: address.email,
         );
       } else {
         throw Exception('Failed to update address: ${response.statusCode}');

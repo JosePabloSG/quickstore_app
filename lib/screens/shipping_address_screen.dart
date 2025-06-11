@@ -127,12 +127,6 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black),
-            onPressed: _addNewAddress,
-          ),
-        ],
       ),
       body:
           _isLoading
@@ -192,11 +186,6 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   );
                 },
               ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNewAddress,
-        backgroundColor: const Color(0xFF004CFF),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
     );
   }
 }
@@ -257,21 +246,6 @@ class AddressCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (address.isDefault)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF004CFF).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Text(
-                      'Default',
-                      style: TextStyle(color: Color(0xFF004CFF), fontSize: 12),
-                    ),
-                  ),
               ],
             ),
             const SizedBox(height: 12),
