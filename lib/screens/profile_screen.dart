@@ -6,11 +6,118 @@ import 'profile_details_screen.dart';
 import 'shipping_address_screen.dart';
 import 'manage_payment_methods_screen.dart';
 import 'terms_screen.dart';
-import 'notification_settings_screen.dart';
-import 'language_currency_screen.dart';
+import 'welcome_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirm Logout'),
+            content: const Text('Are you sure you want to logout?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Logout'),
+              ),
+            ],
+          ),
+    );
+
+    if (shouldLogout == true && context.mounted) {
+      try {
+        await FirebaseAuth.instance.signOut();
+        if (context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+            (route) => false,
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error logging out. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showComingSoonDialog(
+    BuildContext context,
+    String feature,
+  ) async {
+    return showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Coming Soon'),
+            content: Text('$feature will be available in future updates.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget _buildNavigationTile(
+    BuildContext context,
+    String title, {
+    required IconData icon,
+    VoidCallback? onTap,
+    Widget? trailing,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style:
+                  title == 'Logout'
+                      ? const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                      )
+                      : const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+            ),
+            trailing ??
+                Icon(
+                  icon,
+                  size: 16,
+                  color: title == 'Logout' ? Colors.red : Colors.grey,
+                ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +246,9 @@ class ProfileScreen extends StatelessWidget {
                         'Language & Currency',
                         icon: Icons.arrow_forward_ios,
                         onTap: () {
-                          Navigator.push(
+                          _showComingSoonDialog(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => const LanguageCurrencyScreen(),
-                            ),
+                            'Language and currency settings',
                           );
                         },
                       ),
@@ -152,12 +257,9 @@ class ProfileScreen extends StatelessWidget {
                         'Notification Settings',
                         icon: Icons.arrow_forward_ios,
                         onTap: () {
-                          Navigator.push(
+                          _showComingSoonDialog(
                             context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => const NotificationSettingsScreen(),
-                            ),
+                            'Notification settings',
                           );
                         },
                       ),
@@ -168,7 +270,7 @@ class ProfileScreen extends StatelessWidget {
                         trailing: Switch(
                           value: userProvider.user?.isDarkMode ?? false,
                           onChanged: (value) {
-                            userProvider.updatePreferences(isDarkMode: value);
+                            _showComingSoonDialog(context, 'Dark mode');
                           },
                         ),
                       ),
@@ -182,6 +284,13 @@ class ProfileScreen extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           color: Colors.black54,
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildNavigationTile(
+                        context,
+                        'Logout',
+                        icon: Icons.logout,
+                        onTap: () => _logout(context),
                       ),
                       const SizedBox(height: 16),
                       _buildNavigationTile(
@@ -201,36 +310,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
-    );
-  }
-
-  Widget _buildNavigationTile(
-    BuildContext context,
-    String title, {
-    required IconData icon,
-    VoidCallback? onTap,
-    Widget? trailing,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade200, width: 1),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            trailing ?? Icon(icon, size: 16, color: Colors.grey),
-          ],
-        ),
-      ),
     );
   }
 }
