@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:country_picker/src/utils.dart';
 
 class CountrySelectionScreen extends StatefulWidget {
   final String? initialCountry;
@@ -25,21 +24,14 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
   }
 
   void _initCountries() {
-    // Obtener todos los países del paquete country_picker
-    List<Country> countries = [];
-    for (var countryData in Countries.countryList) {
-      try {
-        countries.add(Country.from(json: countryData));
-      } catch (e) {
-        // Ignorar si hay un error al cargar un país específico
-      }
-    }
+    // Get all countries using the built-in method from country_picker
+    final countries = CountryService().getAll();
 
     setState(() {
       _allCountries.addAll(countries);
       _filteredCountries = List.from(_allCountries);
 
-      // Si hay un país inicial seleccionado, lo marcamos
+      // If there's an initial country selected, mark it
       if (widget.initialCountry != null && widget.initialCountry!.isNotEmpty) {
         try {
           _selectedCountry = _allCountries.firstWhere(
@@ -48,7 +40,7 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
                 widget.initialCountry!.toLowerCase(),
           );
         } catch (e) {
-          // Si no encuentra el país, no selecciona ninguno
+          // If country not found, none is selected
         }
       }
     });
