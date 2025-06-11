@@ -36,7 +36,14 @@ class UserProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      _addresses = await _addressService.getAddresses();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser?.email == null) {
+        throw Exception('No user email available');
+      }
+
+      _addresses = await _addressService.getAddresses(
+        userEmail: currentUser!.email!,
+      );
     } catch (e) {
       // En caso de error, usamos las direcciones almacenadas en el usuario
       if (_user != null) {

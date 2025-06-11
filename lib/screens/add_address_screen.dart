@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
@@ -57,6 +58,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
       try {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser == null) {
+          throw Exception('No user logged in');
+        }
 
         final address = Address(
           id: widget.addressToEdit?.id ?? const Uuid().v4(),
@@ -65,6 +70,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           state: _stateController.text.trim(),
           zipCode: _zipCodeController.text.trim(),
           country: _selectedCountry,
+          email: currentUser.email ?? '',
           label: 'Home', // Por defecto usamos "Home", podría ser personalizable
         );
 

@@ -98,6 +98,7 @@ class Address {
   final String zipCode;
   final String country;
   final String? label;
+  final String email;
 
   Address({
     required this.id,
@@ -106,6 +107,7 @@ class Address {
     required this.state,
     required this.zipCode,
     required this.country,
+    required this.email,
     this.label,
   });
 
@@ -118,6 +120,7 @@ class Address {
       'zipCode': zipCode,
       'country': country,
       'label': label,
+      'email': email,
     };
   }
 
@@ -130,6 +133,7 @@ class Address {
       zipCode: map['zipCode'],
       country: map['country'],
       label: map['label'],
+      email: map['email'] ?? '',
     );
   }
 }
