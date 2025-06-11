@@ -22,7 +22,6 @@ class ShippingAddressService {
                 state: json['state'],
                 zipCode: json['zipCode'],
                 country: json['country'],
-                isDefault: json['isDefault'] ?? false,
                 label: json['label'],
               ),
             )
@@ -47,7 +46,6 @@ class ShippingAddressService {
           'state': address.state,
           'zipCode': address.zipCode,
           'country': address.country,
-          'isDefault': address.isDefault,
           'label': address.label,
         }),
       );
@@ -61,7 +59,6 @@ class ShippingAddressService {
           state: data['state'],
           zipCode: data['zipCode'],
           country: data['country'],
-          isDefault: data['isDefault'] ?? false,
           label: data['label'],
         );
       } else {
@@ -84,7 +81,6 @@ class ShippingAddressService {
           'state': address.state,
           'zipCode': address.zipCode,
           'country': address.country,
-          'isDefault': address.isDefault,
           'label': address.label,
         }),
       );
@@ -98,7 +94,6 @@ class ShippingAddressService {
           state: data['state'],
           zipCode: data['zipCode'],
           country: data['country'],
-          isDefault: data['isDefault'] ?? false,
           label: data['label'],
         );
       } else {

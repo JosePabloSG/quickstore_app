@@ -21,10 +21,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
   final _zipCodeController = TextEditingController();
-  final _phoneController = TextEditingController();
 
   String _selectedCountry = '';
-  bool _isDefault = false;
   bool _isLoading = false;
 
   @override
@@ -39,7 +37,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       _stateController.text = address.state;
       _zipCodeController.text = address.zipCode;
       _selectedCountry = address.country;
-      _isDefault = address.isDefault;
     }
   }
 
@@ -49,7 +46,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     _cityController.dispose();
     _stateController.dispose();
     _zipCodeController.dispose();
-    _phoneController.dispose();
     super.dispose();
   }
 
@@ -69,7 +65,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           state: _stateController.text.trim(),
           zipCode: _zipCodeController.text.trim(),
           country: _selectedCountry,
-          isDefault: _isDefault,
           label: 'Home', // Por defecto usamos "Home", podría ser personalizable
         );
 
@@ -313,50 +308,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   }
                   return null;
                 },
-              ),
-
-              const SizedBox(height: 16),
-
-              // Número de teléfono
-              const Text(
-                'Phone Number',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  hintText: 'Required',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  filled: true,
-                  fillColor: const Color(0xFFF1F4FE),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 24),
-
-              // Opción de dirección predeterminada
-              CheckboxListTile(
-                value: _isDefault,
-                onChanged: (value) {
-                  setState(() {
-                    _isDefault = value ?? false;
-                  });
-                },
-                title: const Text('Set as default address'),
-                controlAffinity: ListTileControlAffinity.leading,
-                contentPadding: EdgeInsets.zero,
               ),
 
               const SizedBox(height: 32),

@@ -88,27 +88,6 @@ class UserProvider with ChangeNotifier {
         _addresses.add(updatedAddress);
       }
 
-      // Si es dirección por defecto, actualizar las demás direcciones
-      if (address.isDefault) {
-        for (var i = 0; i < _addresses.length; i++) {
-          if (_addresses[i].id != address.id && _addresses[i].isDefault) {
-            final nonDefaultAddress = Address(
-              id: _addresses[i].id,
-              street: _addresses[i].street,
-              city: _addresses[i].city,
-              state: _addresses[i].state,
-              zipCode: _addresses[i].zipCode,
-              country: _addresses[i].country,
-              label: _addresses[i].label,
-              isDefault: false,
-            );
-
-            await _addressService.updateAddress(nonDefaultAddress);
-            _addresses[i] = nonDefaultAddress;
-          }
-        }
-      }
-
       // También actualizar en el usuario de Firebase si está disponible
       if (_user != null) {
         final userAddresses = List<Address>.from(_user!.addresses);
@@ -143,27 +122,6 @@ class UserProvider with ChangeNotifier {
       // Añadir a la lista local
       _addresses.add(createdAddress);
 
-      // Si es dirección por defecto, actualizar las demás direcciones
-      if (address.isDefault) {
-        for (var i = 0; i < _addresses.length; i++) {
-          if (_addresses[i].id != createdAddress.id &&
-              _addresses[i].isDefault) {
-            final nonDefaultAddress = Address(
-              id: _addresses[i].id,
-              street: _addresses[i].street,
-              city: _addresses[i].city,
-              state: _addresses[i].state,
-              zipCode: _addresses[i].zipCode,
-              country: _addresses[i].country,
-              label: _addresses[i].label,
-              isDefault: false,
-            );
-
-            await _addressService.updateAddress(nonDefaultAddress);
-            _addresses[i] = nonDefaultAddress;
-          }
-        }
-      }
 
       // También actualizar en el usuario de Firebase si está disponible
       if (_user != null) {
