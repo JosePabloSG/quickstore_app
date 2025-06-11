@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../models/user_model.dart';
 
 class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({super.key});
@@ -9,6 +10,7 @@ class NotificationSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final user = userProvider.user;
+    final prefs = user?.notificationPreferences ?? NotificationPreferences();
 
     return Scaffold(
       appBar: AppBar(
@@ -21,61 +23,66 @@ class NotificationSettingsScreen extends StatelessWidget {
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text('Notificaciones de ofertas'),
-            subtitle: const Text('Recibe notificaciones sobre ofertas especiales'),
-            value: user?.notificationPreferences?.offers ?? false,
-            onChanged: (value) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Próximamente'),
-                  content: const Text('La configuración de notificaciones estará disponible en la próxima actualización.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Entendido'),
-                    ),
-                  ],
+            title: const Text('Order Updates'),
+            subtitle: const Text('Get notified about your order status'),
+            value: prefs.orderUpdates,
+            onChanged: (bool value) {
+              userProvider.updateNotificationPreferences(
+                NotificationPreferences(
+                  orderUpdates: value,
+                  promotions: prefs.promotions,
+                  newProducts: prefs.newProducts,
+                  priceAlerts: prefs.priceAlerts,
                 ),
               );
             },
           ),
+          const Divider(),
           SwitchListTile(
-            title: const Text('Notificaciones de pedidos'),
-            subtitle: const Text('Recibe actualizaciones sobre tus pedidos'),
-            value: user?.notificationPreferences?.orders ?? false,
-            onChanged: (value) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Próximamente'),
-                  content: const Text('La configuración de notificaciones estará disponible en la próxima actualización.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Entendido'),
-                    ),
-                  ],
+            title: const Text('Promotions'),
+            subtitle: const Text('Receive special offers and discounts'),
+            value: prefs.promotions,
+            onChanged: (bool value) {
+              userProvider.updateNotificationPreferences(
+                NotificationPreferences(
+                  orderUpdates: prefs.orderUpdates,
+                  promotions: value,
+                  newProducts: prefs.newProducts,
+                  priceAlerts: prefs.priceAlerts,
                 ),
               );
             },
           ),
+          const Divider(),
           SwitchListTile(
-            title: const Text('Notificaciones de marketing'),
-            subtitle: const Text('Recibe información sobre nuevos productos'),
-            value: user?.notificationPreferences?.marketing ?? false,
-            onChanged: (value) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Próximamente'),
-                  content: const Text('La configuración de notificaciones estará disponible en la próxima actualización.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Entendido'),
-                    ),
-                  ],
+            title: const Text('New Products'),
+            subtitle: const Text('Stay updated with new arrivals'),
+            value: prefs.newProducts,
+            onChanged: (bool value) {
+              userProvider.updateNotificationPreferences(
+                NotificationPreferences(
+                  orderUpdates: prefs.orderUpdates,
+                  promotions: prefs.promotions,
+                  newProducts: value,
+                  priceAlerts: prefs.priceAlerts,
+                ),
+              );
+            },
+          ),
+          const Divider(),
+          SwitchListTile(
+            title: const Text('Price Alerts'),
+            subtitle: const Text(
+              'Get notified when items in your wishlist go on sale',
+            ),
+            value: prefs.priceAlerts,
+            onChanged: (bool value) {
+              userProvider.updateNotificationPreferences(
+                NotificationPreferences(
+                  orderUpdates: prefs.orderUpdates,
+                  promotions: prefs.promotions,
+                  newProducts: prefs.newProducts,
+                  priceAlerts: value,
                 ),
               );
             },

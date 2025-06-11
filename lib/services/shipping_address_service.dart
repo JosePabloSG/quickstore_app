@@ -1,131 +1,124 @@
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import '../models/address_model.dart';
+import '../models/user_model.dart';
 
 class ShippingAddressService {
-  final String apiUrl = 'https://682f4084f504aa3c70f35128.mockapi.io/shipping-address';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  static const String baseUrl =
+      'https://682f4084f504aa3c70f35128.mockapi.io/shipping-address';
 
+  // Obtener todas las direcciones
   Future<List<Address>> getAddresses() async {
     try {
-      final user = _auth.currentUser;
-      if (user == null) throw Exception('No authenticated user found');
-
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(baseUrl));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data
-            .map((json) => Address.fromMap(json))
-            .where((address) => address.email == user.email)
+            .map(
+              (json) => Address(
+                id: json['id'],
+                street: json['street'],
+                city: json['city'],
+                state: json['state'],
+                zipCode: json['zipCode'],
+                country: json['country'],
+                isDefault: json['isDefault'] ?? false,
+                label: json['label'],
+              ),
+            )
             .toList();
       } else {
-        throw Exception('Failed to load addresses');
+        throw Exception('Failed to load addresses: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching addresses: $e');
-      return [];
+      throw Exception('Error fetching addresses: $e');
     }
   }
 
+  // Crear una nueva dirección
   Future<Address> createAddress(Address address) async {
     try {
-      final user = _auth.currentUser;
-      if (user == null) throw Exception('No authenticated user found');
-
-      // Asegurarnos de que la dirección tenga el correo del usuario
-      final addressWithEmail = Address(
-        id: address.id,
-        street: address.street,
-        city: address.city,
-        state: address.state,
-        zipCode: address.zipCode,
-        country: address.country,
-        label: address.label,
-        isDefault: address.isDefault,
-        email: user.email!, // Agregamos el email del usuario
-      );
-
-      print('DEBUG - Creando dirección con datos:');
-      print('DEBUG - ID: ${addressWithEmail.id}');
-      print('DEBUG - Street: ${addressWithEmail.street}');
-      print('DEBUG - City: ${addressWithEmail.city}');
-      print('DEBUG - State: ${addressWithEmail.state}');
-      print('DEBUG - ZipCode: ${addressWithEmail.zipCode}');
-      print('DEBUG - Country: ${addressWithEmail.country}');
-      print('DEBUG - Label: ${addressWithEmail.label}');
-      print('DEBUG - IsDefault: ${addressWithEmail.isDefault}');
-      print('DEBUG - Email: ${addressWithEmail.email}');
-
-      final jsonBody = json.encode(addressWithEmail.toMap());
-      print('DEBUG - JSON a enviar: $jsonBody');
-
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse(baseUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonBody,
+        body: json.encode({
+          'street': address.street,
+          'city': address.city,
+          'state': address.state,
+          'zipCode': address.zipCode,
+          'country': address.country,
+          'isDefault': address.isDefault,
+          'label': address.label,
+        }),
       );
-
-      print('DEBUG - Status code: ${response.statusCode}');
-      print('DEBUG - Response body: ${response.body}');
 
       if (response.statusCode == 201) {
-        return Address.fromMap(json.decode(response.body));
+        final data = json.decode(response.body);
+        return Address(
+          id: data['id'],
+          street: data['street'],
+          city: data['city'],
+          state: data['state'],
+          zipCode: data['zipCode'],
+          country: data['country'],
+          isDefault: data['isDefault'] ?? false,
+          label: data['label'],
+        );
       } else {
-        throw Exception('Failed to create address: Status ${response.statusCode}');
+        throw Exception('Failed to create address: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error creating address: $e');
-      rethrow;
+      throw Exception('Error creating address: $e');
     }
   }
 
+  // Actualizar una dirección existente
   Future<Address> updateAddress(Address address) async {
     try {
-      final user = _auth.currentUser;
-      if (user == null) throw Exception('No authenticated user found');
-
-      // Asegurarnos de que la dirección tenga el correo del usuario
-      final addressWithEmail = Address(
-        id: address.id,
-        street: address.street,
-        city: address.city,
-        state: address.state,
-        zipCode: address.zipCode,
-        country: address.country,
-        label: address.label,
-        isDefault: address.isDefault,
-        email: user.email!, // Agregamos el email del usuario
-      );
-
       final response = await http.put(
-        Uri.parse('$apiUrl/${address.id}'),
+        Uri.parse('$baseUrl/${address.id}'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(addressWithEmail.toMap()),
+        body: json.encode({
+          'street': address.street,
+          'city': address.city,
+          'state': address.state,
+          'zipCode': address.zipCode,
+          'country': address.country,
+          'isDefault': address.isDefault,
+          'label': address.label,
+        }),
       );
 
       if (response.statusCode == 200) {
-        return Address.fromMap(json.decode(response.body));
+        final data = json.decode(response.body);
+        return Address(
+          id: data['id'],
+          street: data['street'],
+          city: data['city'],
+          state: data['state'],
+          zipCode: data['zipCode'],
+          country: data['country'],
+          isDefault: data['isDefault'] ?? false,
+          label: data['label'],
+        );
       } else {
-        throw Exception('Failed to update address');
+        throw Exception('Failed to update address: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error updating address: $e');
-      rethrow;
+      throw Exception('Error updating address: $e');
     }
   }
 
-  Future<void> deleteAddress(String id) async {
+  // Eliminar una dirección
+  Future<void> deleteAddress(String addressId) async {
     try {
-      final response = await http.delete(Uri.parse('$apiUrl/$id'));
+      final response = await http.delete(Uri.parse('$baseUrl/$addressId'));
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to delete address');
+        throw Exception('Failed to delete address: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error deleting address: $e');
-      rethrow;
+      throw Exception('Error deleting address: $e');
     }
   }
 }

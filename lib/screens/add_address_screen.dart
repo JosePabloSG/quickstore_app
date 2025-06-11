@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../models/address_model.dart';
+import '../models/user_model.dart';
 import '../providers/user_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AddAddressScreen extends StatefulWidget {
   final Address? addressToEdit;
@@ -22,6 +21,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _cityController = TextEditingController();
   final _stateController = TextEditingController();
   final _zipCodeController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   String _selectedCountry = '';
   bool _isDefault = false;
@@ -49,6 +49,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     _cityController.dispose();
     _stateController.dispose();
     _zipCodeController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -60,11 +61,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
       try {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        final user = FirebaseAuth.instance.currentUser;
-
-        if (user == null) {
-          throw Exception('No user logged in');
-        }
 
         final address = Address(
           id: widget.addressToEdit?.id ?? const Uuid().v4(),
@@ -74,13 +70,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           zipCode: _zipCodeController.text.trim(),
           country: _selectedCountry,
           isDefault: _isDefault,
-          label: 'Home',
-          email: user.email!,
+          label: 'Home', // Por defecto usamos "Home", podría ser personalizable
         );
 
         if (widget.addressToEdit != null) {
+          // Si estamos editando, llamamos a updateAddress
           await userProvider.updateAddress(address);
         } else {
+          // Si es nueva, llamamos a addAddress
           await userProvider.addAddress(address);
         }
 
@@ -92,9 +89,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error saving address: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error saving address: $e')));
         }
       } finally {
         if (mounted) {
@@ -140,23 +137,26 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                readOnly: true,
-                decoration: InputDecoration(
-                  hintText: _selectedCountry.isEmpty ? 'Select a country' : _selectedCountry,
-                  hintStyle: TextStyle(color: _selectedCountry.isEmpty ? Colors.grey[400] : Colors.black),
-                  filled: true,
-                  fillColor: const Color(0xFFF1F4FE),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: const Icon(Icons.arrow_drop_down),
-                ),
-                onTap: () {
+              InkWell(
+                onTap: () async {
+                  // Mostrar selector de país
                   showCountryPicker(
                     context: context,
                     showPhoneCode: false,
+                    countryListTheme: CountryListThemeData(
+                      borderRadius: BorderRadius.circular(16),
+                      inputDecoration: InputDecoration(
+                        hintText: 'Search country',
+                        hintStyle: TextStyle(color: Colors.grey[400]),
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: const Color(0xFFF1F4FE),
+                      ),
+                    ),
                     onSelect: (Country country) {
                       setState(() {
                         _selectedCountry = country.name;
@@ -164,19 +164,49 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     },
                   );
                 },
-                validator: (value) {
-                  if (_selectedCountry.isEmpty) {
-                    return 'Please select a country';
-                  }
-                  return null;
-                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F4FE),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _selectedCountry.isEmpty
+                              ? 'Choose your country'
+                              : _selectedCountry,
+                          style: TextStyle(
+                            color:
+                                _selectedCountry.isEmpty
+                                    ? Colors.grey
+                                    : Colors.black,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF004CFF),
+                      ),
+                    ],
+                  ),
+                ),
               ),
+              if (_selectedCountry.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8.0, left: 12.0),
+                  child: Text(
+                    'Please select a country',
+                    style: TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ),
 
               const SizedBox(height: 16),
 
               // Dirección
               const Text(
-                'Street Address',
+                'Address',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 8),
@@ -285,24 +315,51 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 },
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Dirección por defecto
-              SwitchListTile(
-                title: const Text('Set as default address'),
-                value: _isDefault,
-                onChanged: (bool value) {
-                  setState(() {
-                    _isDefault = value;
-                  });
-                },
-                tileColor: const Color(0xFFF1F4FE),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+              // Número de teléfono
+              const Text(
+                'Phone Number',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  hintText: 'Required',
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  filled: true,
+                  fillColor: const Color(0xFFF1F4FE),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter your phone number';
+                  }
+                  return null;
+                },
               ),
 
               const SizedBox(height: 24),
+
+              // Opción de dirección predeterminada
+              CheckboxListTile(
+                value: _isDefault,
+                onChanged: (value) {
+                  setState(() {
+                    _isDefault = value ?? false;
+                  });
+                },
+                title: const Text('Set as default address'),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+              ),
+
+              const SizedBox(height: 32),
 
               // Botón de guardar
               SizedBox(

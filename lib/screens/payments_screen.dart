@@ -209,7 +209,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           items: cards.map((card) {
                             return DropdownMenuItem(
                               value: card,
-                              child: Text('${card.maskedCardNumber} - ${card.cardHolderName}'),
+                              child: Text('${card.maskedCardNumber} - ${card.cardHolder}'),
                             );
                           }).toList(),
                           onChanged: (card) {

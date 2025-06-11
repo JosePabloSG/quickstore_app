@@ -8,7 +8,6 @@ import 'manage_payment_methods_screen.dart';
 import 'terms_screen.dart';
 import 'notification_settings_screen.dart';
 import 'language_currency_screen.dart';
-import 'login_email_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -169,19 +168,7 @@ class ProfileScreen extends StatelessWidget {
                         trailing: Switch(
                           value: userProvider.user?.isDarkMode ?? false,
                           onChanged: (value) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Próximamente'),
-                                content: const Text('Esta función estará disponible en la próxima actualización.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Entendido'),
-                                  ),
-                                ],
-                              ),
-                            );
+                            userProvider.updatePreferences(isDarkMode: value);
                           },
                         ),
                       ),
@@ -208,54 +195,6 @@ class ProfileScreen extends StatelessWidget {
                               builder: (_) => const TermsScreen(),
                             ),
                           );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildNavigationTile(
-                        context,
-                        'Cerrar sesión',
-                        icon: Icons.logout,
-                        onTap: () async {
-                          final shouldLogout = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Confirmar cierre de sesión'),
-                              content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => Navigator.of(context).pop(true),
-                                  child: const Text('Cerrar sesión'),
-                                ),
-                              ],
-                            ),
-                          );
-
-                          if (shouldLogout == true && context.mounted) {
-                            try {
-                              await FirebaseAuth.instance.signOut();
-                              if (context.mounted) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginEmailScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              }
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Error al cerrar sesión. Intenta de nuevo.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            }
-                          }
                         },
                       ),
                     ],

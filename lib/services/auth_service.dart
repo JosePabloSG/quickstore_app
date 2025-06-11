@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'user_service.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final UserService _userService = UserService();
 
   static const _tokenKey = 'auth_token';
 
@@ -47,13 +45,13 @@ class AuthService {
         // Enviar email de verificación
         await user.sendEmailVerification();
 
-        // Crear el usuario en nuestro servicio
-        await _userService.createUser(
-          user.uid,
-          email,
-          name: fullName,
-          phoneNumber: phoneNumber,
-        );
+        // Guardar información adicional en Firestore
+        await _firestore.collection('users').doc(user.uid).set({
+          'fullName': fullName,
+          'phoneNumber': phoneNumber,
+          'email': email,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
         // Guardar token
         String? token = await user.getIdToken();

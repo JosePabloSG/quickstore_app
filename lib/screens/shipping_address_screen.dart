@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
-import '../models/address_model.dart';
+import '../models/user_model.dart';
 import 'add_address_screen.dart';
 
 class ShippingAddressScreen extends StatefulWidget {
