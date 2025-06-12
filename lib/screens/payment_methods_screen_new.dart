@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quickstore_app/utils/card_formatters.dart';
 import '../models/payment_method.dart';

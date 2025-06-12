@@ -12,19 +12,40 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
+    await Future.delayed(Duration.zero); // evita el setState en build
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirm Logout'),
-            content: const Text('Are you sure you want to logout?'),
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text(
+              'Confirm Logout',
+              style: TextStyle(color: Colors.black),
+            ),
+            content: const Text(
+              'Are you sure you want to logout?',
+              style: TextStyle(color: Colors.black),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade100,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
                 onPressed: () => Navigator.pop(context, true),
                 child: const Text('Logout'),
               ),
@@ -33,23 +54,12 @@ class ProfileScreen extends StatelessWidget {
     );
 
     if (shouldLogout == true && context.mounted) {
-      try {
-        await FirebaseAuth.instance.signOut();
-        if (context.mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-            (route) => false,
-          );
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error logging out. Please try again.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+          (route) => false,
+        );
       }
     }
   }
@@ -58,60 +68,99 @@ class ProfileScreen extends StatelessWidget {
     BuildContext context,
     String feature,
   ) async {
-    return showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Coming Soon'),
-            content: Text('$feature will be available in future updates.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          ),
+              title: const Text(
+                'Coming Soon',
+                style: TextStyle(color: Colors.black),
+              ),
+              content: Text(
+                '$feature will be available in future updates.',
+                style: const TextStyle(color: Colors.black),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+      );
+    });
+  }
+
+  Widget _sectionTitle(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
     );
   }
 
-  Widget _buildNavigationTile(
+  Widget _profileTile(
     BuildContext context,
-    String title, {
+    String label, {
     required IconData icon,
     VoidCallback? onTap,
     Widget? trailing,
+    Color? color,
   }) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade50],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style:
-                  title == 'Logout'
-                      ? const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
-                      )
-                      : const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+            Icon(icon, color: color ?? Colors.black54),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w500,
+                  color: color ?? Colors.black87,
+                ),
+              ),
             ),
             trailing ??
-                Icon(
-                  icon,
+                const Icon(
+                  Icons.arrow_forward_ios,
                   size: 16,
-                  color: title == 'Logout' ? Colors.red : Colors.grey,
+                  color: Colors.grey,
                 ),
           ],
         ),
@@ -126,190 +175,214 @@ class ProfileScreen extends StatelessWidget {
     final firebaseUser = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: const Color(0xFFF2F4F8),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: constraints.maxHeight,
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    floating: true,
+                    elevation: 2,
+                    backgroundColor: Colors.white,
+                    surfaceTintColor: Colors.white,
+                    shadowColor: Colors.black.withOpacity(0.1),
+                    title: const Text(
+                      'My Profile',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                    ),
+                    centerTitle: true,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 32),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.shade50,
+                                  Colors.blue.shade100,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.blue.shade300,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 42,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage:
+                                        user?.photoUrl != null
+                                            ? NetworkImage(user!.photoUrl!)
+                                            : null,
+                                    child:
+                                        user?.photoUrl == null
+                                            ? const Icon(
+                                              Icons.person,
+                                              size: 42,
+                                              color: Colors.grey,
+                                            )
+                                            : null,
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+                                Text(
+                                  user?.name != null &&
+                                          user!.name!.trim().isNotEmpty
+                                      ? user.name!
+                                      : user?.email ??
+                                          firebaseUser?.email ??
+                                          'Guest',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                if (user?.name != null &&
+                                    user!.name!.trim().isNotEmpty &&
+                                    (user.email ?? firebaseUser?.email) != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: Text(
+                                      user.email ?? firebaseUser?.email ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black54,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _sectionTitle("Personal"),
+                          _profileTile(
+                            context,
+                            'Personal Information',
+                            icon: Icons.person_outline,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => const ProfileDetailsScreen(),
+                                  ),
+                                ),
+                          ),
+                          _profileTile(
+                            context,
+                            'Shipping Addresses',
+                            icon: Icons.location_on_outlined,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => const ShippingAddressScreen(),
+                                  ),
+                                ),
+                          ),
+                          _profileTile(
+                            context,
+                            'Payment Methods',
+                            icon: Icons.credit_card,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) =>
+                                            const ManagePaymentMethodsScreen(),
+                                  ),
+                                ),
+                          ),
+                          _sectionTitle("Preferences"),
+                          _profileTile(
+                            context,
+                            'Language & Currency',
+                            icon: Icons.language,
+                            onTap:
+                                () => _showComingSoonDialog(
+                                  context,
+                                  'Language and Currency',
+                                ),
+                          ),
+                          _profileTile(
+                            context,
+                            'Notification Settings',
+                            icon: Icons.notifications_none,
+                            onTap:
+                                () => _showComingSoonDialog(
+                                  context,
+                                  'Notification Settings',
+                                ),
+                          ),
+                          _profileTile(
+                            context,
+                            'Dark Mode',
+                            icon: Icons.dark_mode,
+                            trailing: Switch(
+                              value: userProvider.user?.isDarkMode ?? false,
+                              onChanged:
+                                  (val) => _showComingSoonDialog(
+                                    context,
+                                    'Dark Mode',
+                                  ),
+                              activeColor: Colors.blue.shade700,
+                            ),
+                          ),
+                          _sectionTitle("Other"),
+                          _profileTile(
+                            context,
+                            'Logout',
+                            icon: Icons.logout,
+                            color: Colors.red,
+                            onTap: () => _logout(context),
+                          ),
+                          _profileTile(
+                            context,
+                            'Terms and Conditions',
+                            icon: Icons.description_outlined,
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const TermsScreen(),
+                                  ),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
-      body:
-          userProvider.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Header
-                      Center(
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  user?.photoUrl != null
-                                      ? NetworkImage(user!.photoUrl!)
-                                      : null,
-                              child:
-                                  user?.photoUrl == null
-                                      ? const Icon(Icons.person, size: 50)
-                                      : null,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              user?.name ?? firebaseUser?.email ?? 'Guest',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            if (user?.email != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                user!.email,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-
-                      // Personal Section
-                      const Text(
-                        'Personal',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildNavigationTile(
-                        context,
-                        'Personal Information',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ProfileDetailsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildNavigationTile(
-                        context,
-                        'Shipping Addresses',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ShippingAddressScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildNavigationTile(
-                        context,
-                        'Payment Methods',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => const ManagePaymentMethodsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-
-                      // Preferences Section
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Preferences',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildNavigationTile(
-                        context,
-                        'Language & Currency',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          _showComingSoonDialog(
-                            context,
-                            'Language and currency settings',
-                          );
-                        },
-                      ),
-                      _buildNavigationTile(
-                        context,
-                        'Notification Settings',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          _showComingSoonDialog(
-                            context,
-                            'Notification settings',
-                          );
-                        },
-                      ),
-                      _buildNavigationTile(
-                        context,
-                        'Dark Mode',
-                        icon: Icons.dark_mode,
-                        trailing: Switch(
-                          value: userProvider.user?.isDarkMode ?? false,
-                          onChanged: (value) {
-                            _showComingSoonDialog(context, 'Dark mode');
-                          },
-                        ),
-                      ),
-
-                      // Other Section
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Other',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildNavigationTile(
-                        context,
-                        'Logout',
-                        icon: Icons.logout,
-                        onTap: () => _logout(context),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildNavigationTile(
-                        context,
-                        'Terms and Conditions',
-                        icon: Icons.arrow_forward_ios,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const TermsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
     );
   }
 }

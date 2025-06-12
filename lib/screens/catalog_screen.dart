@@ -24,14 +24,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
   int itemsPerPage = 10;
   int currentPage = 1;
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-    _loadInitialData();
-  }
+@override
+void initState() {
+  super.initState();
+  _scrollController.addListener(_onScroll);
 
-  Future<void> _loadInitialData() async {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _loadInitialData();
+  });
+}
+
+
+ Future<void> _loadInitialData() async {
+  try {
     final productProvider = context.read<ProductProvider>();
     final categoryProvider = context.read<CategoryProvider>();
 
@@ -39,7 +44,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
       productProvider.fetchProducts(),
       categoryProvider.loadCategories(),
     ]);
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error loading data'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
+}
+
 
   void _onScroll() {
     if (_scrollController.position.pixels >=

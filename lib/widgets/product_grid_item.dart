@@ -4,7 +4,6 @@ import '../screens/product_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:quickstore_app/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
-import '../screens/image_zoom_screen.dart';
 
 class ProductGridItem extends StatelessWidget {
   final Product product;
@@ -58,7 +57,7 @@ class ProductGridItem extends StatelessWidget {
             Stack(
               children: [
                 Hero(
-                  tag: 'product-image-detail-${product.id}',
+                 tag: 'product-image-grid-${product.id}',
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(16),
