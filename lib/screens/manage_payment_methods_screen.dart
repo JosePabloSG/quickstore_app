@@ -65,22 +65,23 @@ class _ManagePaymentMethodsScreenState
     final orderNumber = 100000 + DateTime.now().millisecondsSinceEpoch % 99999;
 
     final newPayment = Payment(
-
       paymentsMethodId: card.id,
       amount: amount,
       hourDate: DateTime.now(),
       orderNumber: orderNumber,
     );
 
-    final result =
-        await _paymentService.addPayment(card.id, newPayment); // 👈 FIX
+    final result = await _paymentService.addPayment(
+      card.id,
+      newPayment,
+    ); // 👈 FIX
 
     if (result != null && mounted) {
       await _loadPaymentsForCard(card.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text('Simulated payment \$${amount.toStringAsFixed(2)}')),
+          content: Text('Simulated payment \$${amount.toStringAsFixed(2)}'),
+        ),
       );
     }
   }
@@ -88,36 +89,41 @@ class _ManagePaymentMethodsScreenState
   Future<void> _deleteCard(PaymentMethod card) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Card'),
-        content: const Text('Are you sure you want to delete this card?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Delete',
-                  style: TextStyle(color: Colors.red))),
-        ],
-      ),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Delete Card'),
+            content: const Text('Are you sure you want to delete this card?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
     );
 
     if (confirmed == true) {
       final success = await _cardService.deletePaymentMethod(card.id);
       if (success && mounted) {
         _loadPaymentMethods();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Card deleted')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Card deleted')));
       }
     }
   }
 
   Future<void> _openAddCardScreen() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen()),
-    );
+    final result = await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const AddPaymentMethodScreen()));
 
     if (result != null) {
       _loadPaymentMethods();
@@ -126,10 +132,9 @@ class _ManagePaymentMethodsScreenState
 
   Future<void> _openEditCardScreen(PaymentMethod card) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (_) => EditPaymentMethodScreen(card: card),
-    ));
-    
+      MaterialPageRoute(builder: (_) => EditPaymentMethodScreen(card: card)),
+    );
+
     if (result != null) {
       _loadPaymentMethods();
     }
@@ -141,94 +146,122 @@ class _ManagePaymentMethodsScreenState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Payments Methods',
-            style: TextStyle(color: Colors.black)),
+        title: const Text(
+          'Payments Methods',
+          style: TextStyle(color: Colors.black),
+        ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (_paymentMethods.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('No payment methods added yet')),
-                  )
-                else ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Payment Methods',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 200,
-                    child: PageView.builder(
-                      controller: PageController(viewportFraction: 0.85),
-                      itemCount: _paymentMethods.length,
-                      onPageChanged: (i) {
-                        setState(() => _selectedCardIndex = i);
-                        _loadPaymentsForCard(_paymentMethods[i].id);
-                      },
-                      itemBuilder: (context, index) {
-                        final card = _paymentMethods[index];
-                        return _buildCreditCard(card);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Payment History',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(child: _buildPaymentHistoryList()),
-                ],
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF004CFF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_paymentMethods.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text('No payment methods added yet'),
+                      ),
+                    )
+                  else ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Payment Methods',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      onPressed: _openAddCardScreen,
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      label: const Text(
-                        'Add Card',
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 200,
+                      child: PageView.builder(
+                        controller: PageController(viewportFraction: 0.85),
+                        itemCount: _paymentMethods.length,
+                        onPageChanged: (i) {
+                          setState(() => _selectedCardIndex = i);
+                          _loadPaymentsForCard(_paymentMethods[i].id);
+                        },
+                        itemBuilder: (context, index) {
+                          final card = _paymentMethods[index];
+                          return _buildCreditCard(card);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Payment History',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(child: _buildPaymentHistoryList()),
+                  ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF004CFF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _openAddCardScreen,
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        label: const Text(
+                          'Add Card',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
     );
   }
 
   Widget _buildCreditCard(PaymentMethod card) {
+    final bool isMastercard = card.cardType.toLowerCase() == 'mastercard';
+    final String logoAsset =
+        isMastercard
+            ? 'assets/Images/Mastercard.svg'
+            : 'assets/Images/Visa.svg';
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDF3FF),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A237E), Color(0xFF0D47A1)],
+        ),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(20),
       child: Stack(
@@ -236,22 +269,84 @@ class _ManagePaymentMethodsScreenState
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SvgPicture.asset(
-                card.cardType.toLowerCase() == 'mastercard'
-                    ? 'assets/Images/Mastercard.svg'
-                    : 'assets/Images/Visa.svg',
-                width: 50,
-                height: 50,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SvgPicture.asset(
+                  logoAsset,
+                  width: 50,
+                  height: 30,
+                  colorFilter:
+                      isMastercard
+                          ? null // No aplicar filtro para Mastercard
+                          : const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                ),
               ),
               const Spacer(),
-              Text(card.maskedCardNumber,
-                  style: const TextStyle(letterSpacing: 2)),
-              const SizedBox(height: 8),
+              Text(
+                card.maskedCardNumber,
+                style: const TextStyle(
+                  letterSpacing: 2,
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
-                  Text(card.cardHolder),
-                  const Spacer(),
-                  Text(card.expiryDate),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'CARD HOLDER',
+                          style: TextStyle(
+                            color: Colors.white60,
+                            fontSize: 10,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          card.cardHolder,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text(
+                        'EXPIRES',
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 10,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        card.expiryDate,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -261,12 +356,25 @@ class _ManagePaymentMethodsScreenState
             right: 0,
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.black),
-                  onPressed: () => _openEditCardScreen(card),
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    iconSize: 20,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white12,
+                      padding: const EdgeInsets.all(8),
+                    ),
+                    icon: const Icon(Icons.edit_outlined, color: Colors.white),
+                    onPressed: () => _openEditCardScreen(card),
+                  ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  iconSize: 20,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.red.withOpacity(0.2),
+                    padding: const EdgeInsets.all(8),
+                  ),
+                  icon: const Icon(Icons.delete_outline, color: Colors.white),
                   onPressed: () => _deleteCard(card),
                 ),
               ],
@@ -280,45 +388,44 @@ class _ManagePaymentMethodsScreenState
   Widget _buildPaymentHistoryList() {
     return _payments.isEmpty
         ? const Center(
-            child: Text(
-              'No payments yet.',
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-          )
+          child: Text(
+            'No payments yet.',
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+        )
         : ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemCount: _payments.length,
-            itemBuilder: (context, index) {
-              final p = _payments[index];
-              final formattedDate =
-                  '${p.hourDate.day}/${p.hourDate.month}/${p.hourDate.year} ${p.hourDate.hour.toString().padLeft(2, '0')}:${p.hourDate.minute.toString().padLeft(2, '0')}';
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemCount: _payments.length,
+          itemBuilder: (context, index) {
+            final p = _payments[index];
+            final formattedDate =
+                '${p.hourDate.day}/${p.hourDate.month}/${p.hourDate.year} ${p.hourDate.hour.toString().padLeft(2, '0')}:${p.hourDate.minute.toString().padLeft(2, '0')}';
 
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  child:
-                      Icon(Icons.shopping_bag_outlined, color: Colors.white),
+            return ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              leading: const CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.shopping_bag_outlined, color: Colors.white),
+              ),
+              title: Text(
+                'Order #${p.orderNumber}',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                formattedDate,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              trailing: Text(
+                '-\$${p.amount.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                title: Text(
-                  'Order #${p.orderNumber}',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-                subtitle: Text(
-                  formattedDate,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                trailing: Text(
-                  '-\$${p.amount.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              );
-            },
-          );
+              ),
+            );
+          },
+        );
   }
 }
