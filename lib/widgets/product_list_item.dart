@@ -47,7 +47,7 @@ class ProductListItem extends StatelessWidget {
             Stack(
               children: [
                 Hero(
-                  tag: 'product-image-detail-${product.id}',
+                  tag: 'product-image-list-${product.id}',
                   child: ClipRRect(
                     borderRadius: const BorderRadius.horizontal(
                       left: Radius.circular(16),

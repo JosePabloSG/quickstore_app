@@ -31,9 +31,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
         ).showSnackBar(SnackBar(content: Text('Error loading addresses: $e')));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -42,10 +40,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
       context,
       MaterialPageRoute(builder: (_) => const AddAddressScreen()),
     );
-
-    if (result == true && mounted) {
-      _loadAddresses();
-    }
+    if (result == true && mounted) _loadAddresses();
   }
 
   Future<void> _editAddress(Address address) async {
@@ -55,10 +50,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
         builder: (_) => AddAddressScreen(addressToEdit: address),
       ),
     );
-
-    if (result == true && mounted) {
-      _loadAddresses();
-    }
+    if (result == true && mounted) _loadAddresses();
   }
 
   Future<void> _deleteAddress(Address address) async {
@@ -105,9 +97,7 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
           ).showSnackBar(SnackBar(content: Text('Error deleting address: $e')));
         }
       } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+        if (mounted) setState(() => _isLoading = false);
       }
     }
   }
@@ -137,37 +127,43 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
 
                   if (addresses.isEmpty) {
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.location_off,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'No addresses yet',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            onPressed: _addNewAddress,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add New Address'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF004CFF),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 12,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.location_off,
+                              size: 72,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No addresses yet',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: _addNewAddress,
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add New Address'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF004CFF),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -186,6 +182,12 @@ class _ShippingAddressScreenState extends State<ShippingAddressScreen> {
                   );
                 },
               ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _addNewAddress,
+        icon: const Icon(Icons.add_location_alt, color: Colors.black),
+        label: const Text('Add Address', style: TextStyle(color: Colors.black)),
+        backgroundColor: const Color.fromARGB(255, 12, 82, 245),
+      ),
     );
   }
 }
@@ -204,20 +206,11 @@ class AddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
+      shadowColor: Colors.black12,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -225,24 +218,14 @@ class AddressCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF004CFF).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: Color(0xFF004CFF),
-                  ),
-                ),
-                const SizedBox(width: 12),
+                const Icon(Icons.location_on, color: Color(0xFF004CFF)),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     address.label ?? 'Home',
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -256,50 +239,44 @@ class AddressCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F4FE),
-                    borderRadius: BorderRadius.circular(8),
+                OutlinedButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 16,
+                    color: Color(0xFF004CFF),
                   ),
-                  child: TextButton.icon(
-                    onPressed: onEdit,
-                    icon: const Icon(
-                      Icons.edit,
-                      size: 16,
-                      color: Color(0xFF004CFF),
+                  label: const Text(
+                    'Edit',
+                    style: TextStyle(color: Color(0xFF004CFF)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF004CFF)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    label: const Text(
-                      'Edit',
-                      style: TextStyle(color: Color(0xFF004CFF)),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      minimumSize: Size.zero,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete, size: 16, color: Colors.red),
+                  label: const Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.red),
                   ),
-                  child: TextButton.icon(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete, size: 16, color: Colors.red),
-                    label: const Text(
-                      'Delete',
-                      style: TextStyle(color: Colors.red),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.red),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      minimumSize: Size.zero,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
                     ),
                   ),
                 ),

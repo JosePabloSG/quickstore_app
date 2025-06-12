@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           productProvider.isLoading
-              ? SliverToBoxAdapter(child: _buildGridShimmer())
+              ? _buildGridShimmer()
               : SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverGrid(
@@ -160,15 +160,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGridShimmer() {
-    return GridView.builder(
-      itemCount: 6,
+    return SliverGrid(
+      delegate: SliverChildBuilderDelegate(
+        (_, __) => const ProductGridItemShimmer(),
+        childCount: 6,
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 3 / 4,
-        crossAxisSpacing: 12,
         mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 3 / 4,
       ),
-      itemBuilder: (_, __) => const ProductGridItemShimmer(),
     );
   }
 }
