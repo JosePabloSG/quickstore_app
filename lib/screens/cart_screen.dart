@@ -64,7 +64,7 @@ class CartScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         Image.asset(
-                          'assets/Images/cart.png',
+                          'assets/Images/logo.png',
                           width: 180,
                           height: 180,
                         ),
